@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="74px" height="60px" viewBox="0 0 74 60" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: sketchtool 64 (101010) - https://sketch.com -->
+    <title>670EF085-4352-48A3-9F4A-6872284F4781</title>
+    <desc>Created with sketchtool.</desc>
+    <g id="Mobile" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="M/Homepage" transform="translate(-230.000000, -2370.000000)">
+            <g id="Group-8" transform="translate(230.000000, 2370.000000)">
+                <rect id="Rectangle-Copy-28" fill="#007FA3" opacity="0.245372954" x="0" y="5.82524272" width="55.3398058" height="54.1747573" rx="4.20378341"></rect>
+                <rect id="Rectangle-Copy-29" fill="#FFFFFF" x="5.82524272" y="0" width="55.3398058" height="54.1747573" rx="4.20378341"></rect>
+                <circle id="Oval-Copy-9" fill="#19A5A3" cx="18.0582524" cy="13.3980583" r="2.91262136"></circle>
+                <circle id="Oval-Copy-10" fill="#19A5A3" cx="18.0582524" cy="26.7961165" r="2.91262136"></circle>
+                <circle id="Oval-Copy-11" fill="#19A5A3" cx="18.0582524" cy="40.776699" r="2.91262136"></circle>
+                <rect id="Rectangle-Copy-30" fill="#D3EAE4" x="25.631068" y="12.2330097" width="26.2135922" height="2.91262136" rx="1.45631068"></rect>
+                <rect id="Rectangle-Copy-31" fill="#FFB81C" opacity="0.49983724" x="25.631068" y="25.631068" width="26.2135922" height="2.91262136" rx="1.45631068"></rect>
+                <rect id="Rectangle-Copy-32" fill="#FFB81C" opacity="0.49983724" x="25.631068" y="39.6116505" width="26.2135922" height="2.91262136" rx="1.45631068"></rect>
+                <g id="Group-3-Copy-2" transform="translate(41.359223, 12.233010)">
+                    <path d="M9.54663545,30.0923005 L-3.40646605e-13,33.0297268 L2.93742629,23.4830913 L20.561984,5.85853355 L25.0944328,1.32755349 C26.2370916,0.184894666 28.1052948,0.184894666 29.2479536,1.32755349 L31.703642,3.78177316 C32.8463008,4.9259007 32.8463008,6.79410382 31.703642,7.93676265 L27.1711932,12.4677427 L9.54663545,30.0923005 Z" id="Combined-Shape" fill="#1E496C"></path>
+                    <line x1="23.8665886" y1="9.16313813" x2="8.0779223" y2="24.9518045" id="Stroke-134" stroke="#FFFFFF" stroke-width="1.20108097" stroke-linecap="round" stroke-linejoin="round"></line>
+                    <polyline id="Stroke-135" stroke="#FFFFFF" stroke-width="1.20108097" stroke-linecap="round" stroke-linejoin="round" points="2.93742629 23.4830913 4.40613944 24.9518045 8.0779223 24.9518045 8.0779223 28.6235873 9.54663545 30.0923005"></polyline>
+                    <line x1="22.7650538" y1="3.65546383" x2="29.3742629" y2="10.264673" id="Stroke-137" stroke="#FFFFFF" stroke-width="1.20108097" stroke-linecap="round" stroke-linejoin="round"></line>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
