@@ -5,6 +5,7 @@ import 'package:flutter/painting.dart';
 import 'package:pearson_flutter/screens/app/account.dart';
 import 'package:pearson_flutter/screens/diagnosis/diagnosis_home.dart';
 import 'package:pearson_flutter/screens/practice/practice_home.dart';
+import 'package:pearson_flutter/screens/registration/aacount_setting.dart';
 import 'package:pearson_flutter/screens/registration/add_voucher.dart';
 import 'package:pearson_flutter/screens/report/reports.dart';
 import 'package:pearson_flutter/screens/test_series/test_series_home.dart';
@@ -63,7 +64,10 @@ class _HomePageState extends State<HomePage> {
           onAccountTap: _onAccountTap,
         );
       case 3:
-        return Reports();
+        return Reports(
+          syllabus: _syllabus,
+          onAccountTap: _onAccountTap,
+        );
 
       default:
         return DiagnoseHome(
@@ -88,6 +92,9 @@ class _HomePageState extends State<HomePage> {
         break;
       case AccountMenu.lang_hi:
         // TODO: Handle this case.
+        break;
+      case AccountMenu.account:
+        AppConfig.presentDialogWithChild(context, AccountSetting());
         break;
       case AccountMenu.logout:
         AppConfig.presentDialog(
