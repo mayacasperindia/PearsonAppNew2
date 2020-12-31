@@ -82,9 +82,10 @@ class InputField extends StatelessWidget {
                         child: Text(
                           label.toUpperCase(),
                           textScaleFactor: 0.9,
+                          maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            fontWeight: FontWeight.normal,
+                            fontWeight: FontWeight.w300,
                             fontSize: 11,
                             color: Theme.of(context)
                                 .textTheme

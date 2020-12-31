@@ -1,13 +1,11 @@
 import 'package:fluentui_icons/fluentui_icons.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:pearson_flutter/screens/registration/aacount_setting.dart';
-import 'package:pearson_flutter/screens/registration/add_voucher.dart';
 import 'package:pearson_flutter/utils/config.dart';
 
 import '../registration/login.dart';
 
-enum AccountMenu { voucher, lang_en, lang_hi, logout, account }
+enum AccountMenu { voucher, lang_en, lang_hi, logout }
 
 class Account extends StatefulWidget {
   @override
@@ -156,13 +154,13 @@ class _AccountState extends State<Account> {
                                         ],
                                       ),
                                     ),
-                                    // IconButton(
-                                    //   icon: Icon(
-                                    //     FluentSystemIcons.ic_fluent_edit_filled,
-                                    //   ),
-                                    //   onPressed: () {},
-                                    //   color: Theme.of(context).accentColor,
-                                    // )
+                                    IconButton(
+                                      icon: Icon(
+                                        FluentSystemIcons.ic_fluent_edit_filled,
+                                      ),
+                                      onPressed: () {},
+                                      color: Theme.of(context).accentColor,
+                                    )
                                   ],
                                 ),
                                 SizedBox(height: 10),
@@ -207,40 +205,6 @@ class _AccountState extends State<Account> {
                                 ],
                               ),
                             ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Divider(height: 1, indent: 48),
-                    InkWell(
-                      onTap: () {
-                        Navigator.pop(context, AccountMenu.account);
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.all(15.0),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Icon(FluentSystemIcons
-                                .ic_fluent_person_accounts_filled),
-                            SizedBox(width: 10),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Account Setting'.toUpperCase(),
-                                    textScaleFactor: 0.9,
-                                    style: Theme.of(context).textTheme.bodyText1,
-                                  ),
-                                  Text(
-                                    'Edit Profile',
-                                    textScaleFactor: 0.9,
-                                    style: Theme.of(context).textTheme.caption,
-                                  ),
-                                ],
-                              ),
-                            )
                           ],
                         ),
                       ),
@@ -294,9 +258,10 @@ class _AccountState extends State<Account> {
                     Divider(height: 1),
                     FlatButton(
                       onPressed: () {
-                        Navigator.pop(context, AccountMenu.logout);
+                        _logoutDialog(context);
                       },
                       child: Padding(
+
                         padding: const EdgeInsets.all(15.0),
                         child: Row(
                           children: [

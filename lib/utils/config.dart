@@ -19,9 +19,6 @@ class AppConfig {
   static Color kDividerColorDark = Color(0xffbcbcbc);
   static Color kErrorColorDark = Color(0xffcd0909);
 
-  //Other colors
-  static Color successColor=Color(0xff9080fe);
-
   static double kRadius = 50.0;
   static double kRadiusSmall = 10.0;
   static double kRadiusSmallest = 5.0;
@@ -390,7 +387,7 @@ class AppConfig {
       {EdgeInsets margin, Color barrierColor}) {
     var _width = MediaQuery.of(context).size.width;
     return showGeneralDialog<T>(
-        barrierColor: barrierColor ?? Colors.black87,
+        barrierColor: barrierColor ?? Colors.black38,
         transitionBuilder: (context, a1, a2, widget) {
           return Transform.translate(
             child: Opacity(

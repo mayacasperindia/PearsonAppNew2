@@ -66,7 +66,7 @@ class _ReportsState extends State<Reports>
   void initState() {
     _tabController = TabController(length: 6, vsync: this);
     if (widget.syllabus?.isNotEmpty ?? false)
-      _selectedSyllabus = widget.syllabus[0];
+      _selectedSyllabus = widget.syllabus[1];
     super.initState();
   }
 
@@ -109,7 +109,7 @@ class _ReportsState extends State<Reports>
           ReportDropdown(subject: _subject, topic: _topic, chapter: _chapter, attempt: _attempt,),
           ReportDropdown(subject: _subject, chapter: _chapter, topic: _topic, attempt: _attempt,),
           ReportDropdown(subject: _subject, chapter: _chapter, test: _test, attempt: _attempt,),
-          ReportDropdown(classes: _classes, test: _test, attempt: _attempt,),
+          ReportDropdown( test: _test, attempt: _attempt,),
           ReportDropdown(classes: _classes, test: _test, attempt: _attempt,),
           ReportDropdown(classes: _classes, mode: _mode, test: _test, attempt: _attempt,),
         ],

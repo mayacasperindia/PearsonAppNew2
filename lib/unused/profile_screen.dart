@@ -170,17 +170,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   textScaleFactor: 0.9,
                                   style: Theme.of(context).textTheme.caption,
                                 ),
-                                // Divider(height: 1, indent: 48),
-                                // Text(
-                                //   'Voucher'.toUpperCase(),
-                                //   textScaleFactor: 0.9,
-                                //   style: Theme.of(context).textTheme.bodyText1,
-                                // ),
-                                // Text(
-                                //   'Add Voucher',
-                                //   textScaleFactor: 0.9,
-                                //   style: Theme.of(context).textTheme.caption,
-                                // ),
                               ],
                             ),
                           ),

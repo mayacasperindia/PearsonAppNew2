@@ -5,13 +5,13 @@ import 'package:pearson_flutter/screens/exercise/test_quiz.dart';
 import 'package:pearson_flutter/utils/config.dart';
 import 'package:pearson_flutter/widgets/widgets.dart';
 
-class DiagnosisSubjectItem extends StatelessWidget {
+class PracticeTestItem extends StatelessWidget {
   final int index;
 
   final bool expanded;
   final Function(int index) callback;
 
-  DiagnosisSubjectItem(
+  PracticeTestItem(
       {Key key, this.index, this.callback, this.expanded = false})
       : super(key: key) {
     _controller = ExpandableController(initialExpanded: expanded);
@@ -64,20 +64,20 @@ class DiagnosisSubjectItem extends StatelessWidget {
                   children: [
                     Expanded(
                       child: InkWell(
-                        onTap: () => AppConfig.goto(context, ExerciseScreen(exercise: true,)),
+                        onTap: () => AppConfig.goto(context, ExerciseScreen(chapter: true,)),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
                               children: [
-                                Expanded(child: Text('Exercise')),
+                                Expanded(child: Text('Chapter 1')),
                                 Text('65%'),
                               ],
                             ),
                             SizedBox(height: 5),
                             ClipRRect(
                               borderRadius:
-                                  BorderRadius.circular(AppConfig.kRadiusSmall),
+                              BorderRadius.circular(AppConfig.kRadiusSmall),
                               child: LinearProgressIndicator(
                                 minHeight: 12,
                                 value: 0.65,
@@ -92,20 +92,20 @@ class DiagnosisSubjectItem extends StatelessWidget {
                     SizedBox(width: 10),
                     Expanded(
                       child: InkWell(
-                        onTap: () => AppConfig.goto(context, ExerciseScreen(preMeter: true,)),
+                        onTap: () => AppConfig.goto(context, ExerciseScreen(chapter: true,)),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
                               children: [
-                                Expanded(child: Text('Pre-Meter')),
+                                Expanded(child: Text('Chapter 2')),
                                 Text('15%'),
                               ],
                             ),
                             SizedBox(height: 5),
                             ClipRRect(
                               borderRadius:
-                                  BorderRadius.circular(AppConfig.kRadiusSmall),
+                              BorderRadius.circular(AppConfig.kRadiusSmall),
                               child: LinearProgressIndicator(
                                 minHeight: 12,
                                 value: 0.15,

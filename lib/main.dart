@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:pearson_flutter/homepage.dart';
 import 'package:pearson_flutter/providers/app_settings.dart';
+import 'package:pearson_flutter/screens/exercise/answer_status.dart';
 import 'package:pearson_flutter/screens/registration/login.dart';
 import 'package:pearson_flutter/utils/config.dart';
 import 'package:pearson_flutter/utils/session.dart';
@@ -334,6 +336,10 @@ class MyApp extends StatelessWidget {
           theme: _theme,
           darkTheme: _darkTheme,
           themeMode: ThemeMode.light,
+          routes: {
+            "/home": (_) => HomePage(),
+            "/report": (_) => AnswerStatus(),
+          },
           // themeMode: settings.themeMode,
           // supportedLocales: [
           //   Locale('en', 'US'),
