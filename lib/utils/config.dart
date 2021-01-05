@@ -1,5 +1,8 @@
+import 'dart:math';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:pearson_flutter/utils/page_routes.dart';
 import 'package:pearson_flutter/utils/session.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -169,17 +172,14 @@ class AppConfig {
                     child: GestureDetector(
                       onTap: () {},
                       child: Container(
-                        margin: EdgeInsets.only(
-                          left: 50,
-                          right: 50,
-                          top: 10,
-                          bottom: 10,
-                        ),
+                        margin: EdgeInsets.only(top: 10, bottom: 10),
+                        width: min(_width - 80, 320),
                         decoration: BoxDecoration(
                           color: Theme.of(context).canvasColor,
                           borderRadius:
                               BorderRadius.circular(AppConfig.kRadiusSmall),
                         ),
+                        clipBehavior: Clip.hardEdge,
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
@@ -199,14 +199,17 @@ class AppConfig {
                               ),
                             ),
                             Divider(height: 1),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 5),
-                              child: FractionallySizedBox(
-                                widthFactor: 1,
+                            FractionallySizedBox(
+                              widthFactor: 1,
+                              child: SizedBox(
+                                height: 48,
                                 child: FlatButton(
                                   textColor: buttonTint ??
                                       Theme.of(context).accentColor,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.zero),
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: 15, horizontal: 10),
                                   onPressed: () => Navigator.pop(context, true),
                                   child: Text(
                                     buttonText ?? "OK",
@@ -266,16 +269,16 @@ class AppConfig {
                       onTap: () {},
                       child: Container(
                         margin: EdgeInsets.only(
-                          left: 50,
-                          right: 50,
                           top: 10,
                           bottom: 10,
                         ),
+                        width: min(_width - 80, 320),
                         decoration: BoxDecoration(
                           color: Theme.of(context).canvasColor,
                           borderRadius:
                               BorderRadius.circular(AppConfig.kRadiusSmall),
                         ),
+                        clipBehavior: Clip.hardEdge,
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
@@ -324,16 +327,17 @@ class AppConfig {
                               ),
                             ),
                             Divider(height: 1),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 5),
-                              child: Row(
-                                children: <Widget>[
-                                  Expanded(
+                            Row(
+                              children: <Widget>[
+                                Expanded(
+                                  child: SizedBox(
+                                    height: 48,
                                     child: FlatButton(
                                       onPressed: () =>
                                           Navigator.pop(context, false),
                                       textColor: negativeTint ?? null,
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.zero),
                                       child: Text(
                                         negativeButtonText ??
                                             "Cancel".toUpperCase(),
@@ -345,12 +349,22 @@ class AppConfig {
                                       ),
                                     ),
                                   ),
-                                  Expanded(
+                                ),
+                                Container(
+                                  height: 48,
+                                  width: 0.5,
+                                  color: Theme.of(context).dividerColor,
+                                ),
+                                Expanded(
+                                  child: SizedBox(
+                                    height: 48,
                                     child: FlatButton(
                                       textColor: positiveTint ??
                                           Theme.of(context).accentColor,
                                       onPressed: () =>
                                           Navigator.pop(context, true),
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.zero),
                                       child: Text(
                                         positiveButtonText ??
                                             "Submit".toUpperCase(),
@@ -362,8 +376,8 @@ class AppConfig {
                                       ),
                                     ),
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             )
                           ],
                         ),
@@ -400,7 +414,10 @@ class AppConfig {
                   backgroundColor: Colors.transparent,
                   body: GestureDetector(
                     onTap: () {},
-                    child: child,
+                    child: Padding(
+                      padding: margin ?? EdgeInsets.all(15),
+                      child: child,
+                    ),
                   ),
                 ),
               ),

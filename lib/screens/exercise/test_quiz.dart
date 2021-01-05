@@ -1,12 +1,16 @@
 import 'dart:async';
+import 'dart:ffi';
+import 'package:fluentui_icons/fluentui_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
-import 'package:pearson_flutter/homepage.dart';
+import 'package:flutter/widgets.dart';
 import 'package:pearson_flutter/screens/exercise/answer_status.dart';
-import 'package:pearson_flutter/screens/exercise/attended_answer_screen.dart';
+import 'package:pearson_flutter/screens/exercise/information.dart';
 import 'package:pearson_flutter/screens/exercise/instruction_bottom_sheet.dart';
-import 'package:pearson_flutter/screens/exercise/sampleQuestion.dart';
 import 'package:pearson_flutter/screens/exercise/sampleQuestionModel.dart';
+import 'package:pearson_flutter/utils/config.dart';
+import 'package:pearson_flutter/widgets/widgets.dart';
+import 'package:sticky_headers/sticky_headers.dart';
 
 class QuestionScreen extends StatefulWidget {
   final bool exercise;
@@ -18,7 +22,17 @@ class QuestionScreen extends StatefulWidget {
   final bool nonProctoredTest;
   final bool unit;
 
-  const QuestionScreen({Key key, this.unit, this.exercise, this.preMeter, this.practice, this.chapter, this.previousYear, this.proctoredTest, this.nonProctoredTest}) : super(key: key);
+  const QuestionScreen({
+    Key key,
+    this.unit = false,
+    this.exercise = false,
+    this.preMeter = false,
+    this.practice = false,
+    this.chapter = false,
+    this.previousYear = false,
+    this.proctoredTest = false,
+    this.nonProctoredTest = false,
+  }) : super(key: key);
 
   @override
   _QuestionScreenState createState() => _QuestionScreenState();
@@ -26,40 +40,59 @@ class QuestionScreen extends StatefulWidget {
 
 class _QuestionScreenState extends State<QuestionScreen> {
   BottomSheetWidget instructionModal = new BottomSheetWidget();
-  int currentOptionId;
-  bool isCorrect;
-  List<QuestionModel> questions = new List<QuestionModel>();
-  int index = 0;
-  int secondsRemaining = 6000;
+  var _questions = <QuestionModel>[];
+  int _index = 0;
+  int _rem = 6000;
   Timer _timer;
-  int answer = 3;
+  PageController _controller = PageController();
 
+  _init() {
+    for (int i = 0; i < 3; i++)
+      _questions.add(
+        QuestionModel(
+          "${i + 1}: General physics and motion in a straight line?",
+          [
+            Answer("Scalars & vectors"),
+            Answer("Motion in a Physics"),
+            Answer("Units & measurements"),
+            Answer(
+              "Projectile motion",
+              isCorrectAnswer: true,
+              definition: "This is the definition of the answer.",
+            ),
+          ],
+        ),
+      );
+  }
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    questions = getQuestions();
+    _init();
     _startTimer();
   }
 
   _startTimer() {
-    secondsRemaining = 6000;
+    _rem = 6000;
     _timer = Timer.periodic(Duration(seconds: 1), (Timer timer) {
-      if (secondsRemaining <= 1) {
+      if (_rem <= 1) {
         timer.cancel();
       }
       setState(() {
-        secondsRemaining -= 1;
-        if (secondsRemaining <= 0) {
-          Navigator.pushReplacement(context, MaterialPageRoute(
-              builder: (context) => AnswerStatus()
-          ));
+        _rem -= 1;
+        if (_rem <= 0) {
+          _viewReport();
         }
       });
     });
   }
 
+  _viewReport() {
+    AppConfig.popGoto(
+      context,
+      AnswerStatus(questions: _questions),
+    );
+  }
 
   @override
   dispose() {
@@ -68,508 +101,567 @@ class _QuestionScreenState extends State<QuestionScreen> {
   }
 
   void nextQuestion() {
-    if (index < questions.length - 1) {
-      index++;
+    if (_index < _questions.length - 1) {
+      _gotoQuestion(_index + 1);
     } else {
-      showCloseExamDialog();
-
+      if (_showAnswer || widget.preMeter ) {
+        showExerciseEnd();
+      } else {
+        showCloseExamDialog();
+      }
     }
   }
 
   void prevQuestion() {
-    if (index > 0) {
-      index--;
+    if (_index > 0) {
+      _gotoQuestion(_index - 1);
     }
   }
 
-  void fixedQuestion(int id) {
-      index = id;
+  _gotoQuestion(int index) {
+    setState(() {
+      _index = index;
+    });
+    _controller.animateToPage(
+      index,
+      duration: Duration(milliseconds: 300),
+      curve: Curves.decelerate,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final isCompleted = isCorrect != null;
-    // final _question = Provider.of<QuizNotifier>(context);
-
     return WillPopScope(
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text('$secondsRemaining Minutes'),
-          centerTitle: true,
-          actions: [
-            TextButton(onPressed: () {
-              showInstructionDialog();
-            }, child: Column(
-              children: [
-                Icon(Icons.book),
-                Text('Show Instruction'),
-              ],
-            )),
-          ],
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text(_formatTime),
+            bottom: _showPages
+                ? PreferredSize(
+                    child: _bubble(),
+                    preferredSize: Size.fromHeight(40),
+                  )
+                : null,
+            actions: [
+              IconButton(
+                onPressed: () {
+                  showInstructionDialog();
+                },
+                icon: Icon(FluentSystemIcons.ic_fluent_info_regular),
+              ),
+            ],
+            elevation: 1,
+          ),
+          body: _body(),
+          bottomNavigationBar:
+              (widget.exercise || widget.preMeter) ? null : _buildOption(),
         ),
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
-          child: SingleChildScrollView(
+        onWillPop: () async {
+          showCloseExamDialog();
+          return true;
+        });
+  }
+
+  _bubble() {
+    return SizedBox(
+      height: 48,
+      child: ListView.builder(
+        itemCount: _questions.length,
+        scrollDirection: Axis.horizontal,
+        padding: EdgeInsets.symmetric(horizontal: 10),
+        itemBuilder: (_, int index) {
+          return GestureDetector(
+            onTap: () {
+              _gotoQuestion(index);
+            },
             child: Container(
-              height: MediaQuery.of(context).size.height * 0.92,
-              child: Column(
-                // crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  (widget.exercise || widget.preMeter) ? Container() :
-                  Container(
-                    height: 40,
-                      child: ListView.builder
-                        (
-                          itemCount: questions.length,
-                          scrollDirection: Axis.horizontal,
-                          itemBuilder: (BuildContext ctxt, int index) {
-                            return GestureDetector(
-                              onTap: () {
-                                fixedQuestion(index);
-                              },
-                              child: Container(
-                                margin: EdgeInsets.all(5),
-                                padding: EdgeInsets.all(5),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(100),
-                                    border: Border.all(color: Theme.of(context).accentColor),
-                                  color: Theme.of(context).accentColor,
-                                ),
-                                // color: Colors.green,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                  children: [
-                                    Text((index + 1).toString(), style: TextStyle(
-                                        color: Theme.of(context).primaryColor,
-                                    ),),
-                                  ],
-                                ),
-                              ),
-                            );
-                          }
-                      )
-                  ) ,
-                  SizedBox(height: 20,),
-                  Text(
-                    questions[index].question,
-                    style: Theme.of(context).textTheme.headline5,
-                  ),
-                  SizedBox(height: 15),
-                  RadioListTile(
-                    title: Row(
-                      children: [
-                        Text("Scalars and Vectors"),
-                        (isCorrect != null) ? ((answer == 1) ? Icon(Icons.check, color: Colors.green,) : Icon(Icons.clear, color: Colors.red,)) : Text('')
-
-                      ],
-                    ),
-                    groupValue: currentOptionId,
-                    value: 1,
-                    onChanged: (value) {
-                      if (!isCompleted)
-                        setState(() {
-                          currentOptionId = value;
-                        });
-                    },
-                  ),
-                  RadioListTile(
-                    title: Row(
-                      children: [
-                        Text("Motion in a Plane"),
-                        (isCorrect != null) ? ((answer == 2) ? Icon(Icons.check, color: Colors.green,) : Icon(Icons.clear, color: Colors.red,)) : Text('')
-                      ],
-                    ),
-                    groupValue: currentOptionId,
-                    value: 2,
-                    onChanged: (value) {
-                      if (!isCompleted)
-                        setState(() {
-                          currentOptionId = value;
-                        });
-                    },
-                  ),
-                  RadioListTile(
-                    title: Row(
-                      children: [
-                        Text("Units and Measurements"),
-                        Container(
-                          width: 20,
-                          child: (isCorrect != null) ? ((answer == 3) ? Icon(Icons.check, color: Colors.green,) : Icon(Icons.clear, color: Colors.red,)) : Text(''),
-                        )
-                      ],
-                    ),
-                    groupValue: currentOptionId,
-                    value: 3,
-                    onChanged: (value) {
-                      if (!isCompleted)
-                        setState(() {
-                          currentOptionId = value;
-                        });
-                    },
-                  ),
-                  RadioListTile(
-                    title: Row(
-                      children: [
-                        Text("Projectile Motion"),
-                        (isCorrect != null) ? ((answer == 4) ? Icon(Icons.check, color: Colors.green,) : Icon(Icons.clear, color: Colors.red,)) : Text('')
-                      ],
-                    ),
-                    groupValue: currentOptionId,
-                    value: 4,
-                    onChanged: (value) {
-                      if (!isCompleted)
-                        setState(() {
-                          currentOptionId = value;
-                        });
-                    },
-                  ),
-
-                  // Spacer(),
-                  (widget.preMeter || widget.proctoredTest || widget.unit || widget.chapter ) ? Container() :
-                  (isCorrect != null) ?
-                    Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text("Answer:", style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold
-                          ),),
-                          Text('General Physics and Motion in a Straight Line'),
-                          Text('Units and Measurements'),
-                          Text('Mathematical Physics'),
-                          Text('Motion in One Dimension'),
-                          Text('Graphical Representation of Motion in One Dimension'),
-                        ],
+              width: 36,
+              height: 36,
+              margin: EdgeInsets.only(right: 5),
+              decoration: _index == index
+                  ? BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: Theme.of(context).accentColor,
                       ),
-                    ) : Container(),
-                  SizedBox(height: 20),
-                  SizedBox(
-                    width: double.infinity,
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        RaisedButton(
-                          child: Text(isCompleted ? 'Continue' : 'Submit', style: TextStyle(
-                            color: Colors.white
-                          ),),
-                          onPressed: () {
-                            if (currentOptionId != null)
-                              setState(() {
-                                isCorrect = currentOptionId == answer;
-                              });
-                            if(isCompleted) {
-                              isCorrect = null;
-                              currentOptionId = null;
-                              nextQuestion();
-                            }
-                          },
-                        ),
-                        RaisedButton(
-                          child: Text(isCompleted ? 'Selected' : 'Clear', style: TextStyle(
-                            color: Colors.white
-                          ),),
-                          onPressed: () {
-                            isCompleted ? null : setState(() {
-                              currentOptionId = null;
-                            });
-
-                          },
-                        ),
-                      ],
-                    ),
+                    )
+                  : null,
+              child: Container(
+                margin: EdgeInsets.all(2),
+                padding: EdgeInsets.all(10),
+                width: 32,
+                height: 32,
+                decoration: _getDecoration(index),
+                alignment: Alignment.center,
+                child: Text(
+                  (index + 1).toString(),
+                  style: TextStyle(
+                    color: _getColor(index),
                   ),
-                  SizedBox(height: 10,),
-                  // for (var i = 1; i <= questions.length + 1; i++)
-                  //   Row(
-                  //     children: [
-                  //       Text(i.toString()),
-                  //     ],
-                  //   ),
-
-                ],
+                ),
               ),
             ),
-          ),
-        ),
-        bottomNavigationBar: (widget.exercise || widget.preMeter) ? null : _buildOption(),
-      ), onWillPop: () async {
-      showCloseExamDialog();
-      return true;
+          );
+        },
+      ),
+    );
+  }
+
+  _getColor(index) {
+    if (_questions[index].marked || _questions[index].flagged)
+      return Colors.white;
+    return Theme.of(context).accentColor;
+  }
+
+  _getDecoration(index) {
+    if (_questions[index].flagged)
+      return BoxDecoration(
+        shape: BoxShape.circle,
+        color: Colors.orange,
+        border: Border.all(color: Colors.orange),
+      );
+    if (_questions[index].marked)
+      return BoxDecoration(
+        shape: BoxShape.circle,
+        color: Colors.indigo,
+        border: Border.all(color: Colors.indigo),
+      );
+    return BoxDecoration(
+      shape: BoxShape.circle,
+      color: Theme.of(context).accentColor.withOpacity(0.2),
+      border: Border.all(color: Theme.of(context).accentColor),
+    );
+  }
+
+  get _formatTime {
+    var min = _rem ~/ 60;
+    var sec = _rem % 60;
+    if (min > 0) {
+      return "${min}m ${sec}s rem";
     }
-    );
+    return "${sec}s rem";
   }
 
-  void showCloseExamDialog() {
-    showDialog(context: context,
-        builder: (_) =>
-            AlertDialog(
-              title: Text('Finishing'),
-              content: Text('You Attempted 10 out of 45, Are you sure want to end test?'),
-              actions: [
-                TextButton(onPressed: () {
-                  Navigator.of(context).pop();
-                }, child: Text('No')),
-                TextButton(onPressed: () {
-                  Navigator.pop(context);
-                  showFlagDialog();
-                  // Navigator.pop(context);
-                }, child: Text('Yes'))
-              ],
-            )
-    );
-  }
+  bool get _showAnswer => widget.exercise && _questions[_index].done;
 
-  void showFlagDialog() {
-    showDialog(context: context,
-        builder: (_) =>
-            AlertDialog(
-              title: Text('Finishing'),
-              content: Text('2 Flag questions are there do you want to submit?'),
-              actions: [
-                TextButton(onPressed: () {
-                  Navigator.of(context).pop();
-                }, child: Text('No')),
-                TextButton(onPressed: () {
-                  Navigator.pop(context);
-                  showSuccessDialog();
-                  // Navigator.pop(context);
-                }, child: Text('Yes'))
-              ],
-            )
-    );
-  }
-
-  void showSuccessDialog() {
-    showDialog(context: context,
-        barrierDismissible: false,
-        builder: (_) =>
-            AlertDialog(
-              title: Text('Finished'),
-              content: Text('Test Submitted Successfully.'),
-              actions: [
-                // TextButton(onPressed: () {
-                //   Navigator.pushReplacement(
-                //       context,
-                //       MaterialPageRoute(
-                //           builder: (context) => HomePage()));
-                // }, child: Text('No')),
-                TextButton(onPressed: () {
-                  Navigator.of(context).pushNamedAndRemoveUntil(
-                    '/report',
-                        (Route<dynamic> route) => false,
-                  );
-                  // Navigator.pop(context);
-                }, child: Text('View Report'))
-              ],
-            )
-    );
-  }
-
-  void showInstructionDialog() {
-    showDialog(context: context,
-        builder: (_) =>
-            AlertDialog(
-              title: Text('INSTRUCTIONS'),
-              content: SingleChildScrollView(
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
+  _body() {
+    return PageView.builder(
+        controller: _controller,
+        itemCount: _questions.length,
+        physics: NeverScrollableScrollPhysics(),
+        itemBuilder: (_, int index) {
+          return Column(
+            children: [
+              Container(
+                color: Theme.of(context).backgroundColor,
+                width: double.maxFinite,
+                padding: const EdgeInsets.all(10.0),
+                child: Text(
+                  _questions[index].question,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              Flexible(
+                child: SingleChildScrollView(
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Instruction('Domain', 'Neet'),
-                      Instruction('Test Name', 'General Physics and Motion in a Straight Line - 1'),
-                      Instruction('No. Of Questions','45'),
-                      Instruction('Allocated Time', '60Mins'),
-                      Text('Navigation Tools'),
-                      NavigationTool('Mark', '* Mark: To mark a question for review (To Respond Later), click on mark button.'),
-                      NavigationTool('Flag', 'Flag: To flag a question (To respond later), choose an answer and click on flag button.'),
-                      NavigationTool('Next', 'Next: By clicking Next button, the next question appears.'),
-                      NavigationTool('Previous', 'Previous: By clicking Previous button, the previous question appears.'),
-                      NavigationTool('End Test', 'End Test: By clicking End Test button, the test gets submitted.'),
-                      Text('Standard Instructions', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),),
-                      StandardInstructions('**Chapter Tests are autogenerated '),
-                      StandardInstructions(' * The clock of 60 mins will be set at the server. The countdown timer in the top center of the screen will display the remaining time available for you to complete the test. When the timer reaches zero, the test will end by itself. You will not be required to end or submit your examination. '),
-                      StandardInstructions('* The Test consists of 45 questions. The maximum marks are 180. '),
-                      StandardInstructions('* Each question is allotted 4 (four) marks for correct response and 1(one) mark will be deducted for indicating incorrect response of each question. No deduction from the total score will be made if no response is indicated for an item.'),
-                      StandardInstructions('* You can click on the arrow icon, appears to the top left of the screen, to collapse the question palette thereby maximizing the question window. To view the question palette again, click on the icon again. '),
-                      StandardInstructions('* Procedure for answering a multiple-choice type question: a. To select you answer, click on the button of one of the options. b. To change your chosen answer, click on the button of another option c. To save your answer, you MUST click on the Next button. d. To mark the question for review, click on the Mark for Review button. '),
-                      StandardInstructions('* To change your answer to a question that has already been answered, first select that question from question pallet for answering and then follow the procedure for answering that type of question. '),
-                      StandardInstructions('* You can shuffle between sections and questions anything during the examination as per your convenience only during the time stipulated. '),
-                      StandardInstructions('* Please contact your Test Administrator in case of a power failure as the test may be recovered. If test recovery is not possible then test will have to be rescheduled. '),
-                      StandardInstructions('* In case of complete Internet failure, submission will not be possible & the test will have to be rescheduled. In case of temporary internet outage please wait for some time and try to resubmit the test. '),
-                      StandardInstructions('* If the internet speed is unreasonably slow, images and tables in the question may take a little longer to appear. '),
-                      StandardInstructions('* This is a Multiple-Choice Question (MCQ) type Test. You can go back to the previous questions. '),
-                      Text('Help Center', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),),
-                      StandardInstructions('1 - In case there is a power failure or internet connection breaks, the timer will stop at that very instant. The user can resume the test from where it was left.For test recovery or reschedule please contact your local administrator or write an email to myinsights.support@pearson.com mentioning your User Id.'),
-                      Text('Security', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),),
-                      StandardInstructions(' Once logged-in through one browser tab, user cannot login from any other browser/same browser tab.'),
-                      Text('Legend', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),),
-                      Row(
-                        children: [
-                          Container(
-                            margin: EdgeInsets.only(top: 10),
-                            padding: EdgeInsets.all(5),
-                            color: Colors.greenAccent,
-                            child: Text('01', style: TextStyle(fontSize: 14),),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(5.0),
-                            child: Text('Attempted', style: TextStyle(fontSize: 14),),
-                          ),
-                        ],
+                      Column(
+                        children: _questions[index]
+                            .answers
+                            .map((e) => Column(
+                                  children: [
+                                    AnswerRadio(
+                                      e?.answer,
+                                      onSelect: () {
+                                        setState(() {
+                                          _questions[index].selectAnswer(e);
+                                        });
+                                        if (_autoNext) nextQuestion();
+                                      },
+                                      selected: e.selected,
+                                      correctAnswer: e.isCorrectAnswer,
+                                      completed: _questions[index].done,
+                                    ),
+                                    Divider(height: 1),
+                                  ],
+                                ))
+                            .toList(),
                       ),
-                      Row(
-                        children: [
-                          Container(
-                            margin: EdgeInsets.only(top: 10),
-                            padding: EdgeInsets.all(5),
-                            color: Colors.redAccent,
-                            child: Text('02', style: TextStyle(fontSize: 14),),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(5.0),
-                            child: Text('Flag', style: TextStyle(fontSize: 14),),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Container(
-                            margin: EdgeInsets.only(top: 10),
-                            padding: EdgeInsets.all(5),
-                            color: Colors.blueAccent,
-                            child: Text('03', style: TextStyle(fontSize: 14),),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(5.0),
-                            child: Text('Mark', style: TextStyle(fontSize: 14),),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Container(
-                            margin: EdgeInsets.only(top: 10),
-                            padding: EdgeInsets.all(5),
-                            color: Colors.grey,
-                            child: Text('04', style: TextStyle(fontSize: 14),),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(5.0),
-                            child: Text('Unattempted', style: TextStyle(fontSize: 14),),
-                          ),
-                        ],
-                      ),
+                      _showAnswer
+                          ? Container(
+                              decoration: BoxDecoration(
+                                  color: Colors.green.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(
+                                      AppConfig.kRadiusSmall)),
+                              padding: EdgeInsets.symmetric(vertical: 10),
+                              margin: EdgeInsets.all(10),
+                              child: Column(
+                                children: [
+                                  LabelValueHolder(
+                                    "Correct Answer",
+                                    _questions[index].correctAnswer?.answer,
+                                    icon: FluentSystemIcons
+                                        .ic_fluent_checkmark_circle_regular,
+                                  ),
+                                  LabelValueHolder(
+                                    "Definition",
+                                    _questions[index].correctAnswer?.definition,
+                                    icon: FluentSystemIcons
+                                        .ic_fluent_text_description_regular,
+                                  ),
+                                ],
+                              ),
+                            )
+                          : SizedBox.shrink(),
+                      SizedBox(height: 20),
                     ],
                   ),
                 ),
               ),
-              actions: [
-                TextButton(onPressed: () {
-                  Navigator.pop(context);
-                  // Navigator.pop(context);
-                }, child: Text('Understand'))
-              ],
-            )
+              Row(
+                children: [
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: OutlineButton(
+                      child: Text(
+                        "Clear".toUpperCase(),
+                      ),
+                      onPressed: _questions[index].selectedAnswer == null
+                          ? null
+                          : _questions[index].done
+                              ? null
+                              : () {
+                                  setState(() {
+                                    _questions[index].clearAnswer();
+                                  });
+                                },
+                    ),
+                  ),
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: _nextButton,
+                  ),
+                  SizedBox(width: 10),
+                ],
+              )
+            ],
+          );
+        });
+  }
+
+  Widget get _nextButton {
+    if (_questions[_index].done) {
+      if (_index >= _questions.length - 1) {
+        return FlatButton(
+          color: Colors.red,
+          textColor: Colors.white,
+          child: Text("End Test".toUpperCase()),
+          onPressed: nextQuestion,
+        );
+      }
+      return FlatButton(
+        color: Colors.green,
+        textColor: Colors.white,
+        child: Text(
+          "Next".toUpperCase(),
+        ),
+        onPressed: () => nextQuestion(),
+      );
+    }
+    if (_showAnswer) {
+      return FlatButton(
+        color: Colors.green,
+        textColor: Colors.white,
+        child: Text(
+          "View Answer".toUpperCase(),
+        ),
+        onPressed: _questions[_index].selectedAnswer == null &&
+                !(_questions[_index].done)
+            ? null
+            : () {
+                setState(() => _questions[_index].done = true);
+              },
+      );
+    }
+    return FlatButton(
+      color: Colors.green,
+      textColor: Colors.white,
+      child: Text(
+        "Next".toUpperCase(),
+      ),
+      onPressed: _questions[_index].selectedAnswer == null &&
+              !(_questions[_index].done)
+          ? null
+          : () {
+              if (!(widget.chapter || widget.unit)) {
+                setState(() {
+                  _questions[_index].done = true;
+                });
+              }
+              nextQuestion();
+            },
     );
   }
+
+  bool get _showPages =>
+      widget.chapter || widget.unit || widget.nonProctoredTest;
+
+  void showExerciseEnd() {
+    AppConfig.presentDialog(
+      context,
+      icon: FluentSystemIcons.ic_fluent_help_circle_filled,
+      title: "End Test?",
+      message: "Are you sure? You want to submit test?",
+      positiveButtonText: "Yes".toUpperCase(),
+      negativeButtonText: "Cancel".toUpperCase(),
+      positiveTint: Colors.red,
+      headerColor: Colors.red,
+    ).then((value) {
+      if (value ?? false) {
+        showSuccessDialog();
+      }
+    });
+  }
+
+  void showCloseExamDialog() {
+    AppConfig.presentDialog(
+      context,
+      icon: FluentSystemIcons.ic_fluent_help_circle_filled,
+      title: "End Test?",
+      message:
+          "You attempted ${_index + 1} of ${_questions.length} questions.\nDo you really want to end the test?",
+      positiveButtonText: "Yes".toUpperCase(),
+      negativeButtonText: "No".toUpperCase(),
+      positiveTint: Colors.red,
+      headerColor: Colors.red,
+    ).then((value) {
+      if (value ?? false) {
+        showFlagDialog();
+      }
+    });
+  }
+
+  void showFlagDialog() {
+    AppConfig.presentDialog(
+      context,
+      icon: FluentSystemIcons.ic_fluent_help_circle_filled,
+      title: "End Test?",
+      message: "There are 2 flagged questions.\nDo you really want to submit?",
+      positiveButtonText: "Yes".toUpperCase(),
+      negativeButtonText: "No".toUpperCase(),
+      positiveTint: Colors.orange,
+      headerColor: Colors.orange,
+    ).then((value) {
+      if (value ?? false) {
+        showSuccessDialog();
+      }
+    });
+  }
+
+  void showSuccessDialog() {
+    AppConfig.presentMessage(context,
+            iconColor: Colors.green,
+            message: "Test submitted successfully!",
+            buttonText: "View Report".toUpperCase())
+        .then((value) {
+      if (value ?? false) {
+        _viewReport();
+      }
+    });
+  }
+
+  void showInstructionDialog() {
+    AppConfig.presentDialogWithChild(
+      context,
+      ExerciseInfo(),
+      margin: EdgeInsets.all(20),
+    );
+    return;
+  }
+
+  bool _autoNext = false;
 
   _buildOption() {
-    return Padding(padding: EdgeInsets.symmetric(horizontal: 5),
-    child: Container(
+    return Container(
+      color: Theme.of(context).backgroundColor,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        mainAxisAlignment: MainAxisAlignment.end,
         mainAxisSize: MainAxisSize.min,
         children: [
-            Row(
-            children: [
-              Expanded(child: FlatButton(
-                onPressed: () {},
-                child: Text('Flag',),
-                color: Colors.red,
-              ),
-              ),
-              SizedBox(width: 2,),
-              Expanded(child: FlatButton(
-                onPressed: () {},
-                child: Text('Mask'),
-                color: Colors.blue,
-              ),
-              ),
-              SizedBox(width: 2,),
-            ],
+          SwitchListTile(
+            value: _autoNext,
+            onChanged: (v) {
+              setState(() => _autoNext = v);
+            },
+            title: Text(
+              "Auto Next",
+              overflow: TextOverflow.ellipsis,
+              textScaleFactor: 0.8,
+            ),
+            subtitle: Text(
+              "Automatically go to next question",
+              textScaleFactor: 0.8,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
-          Row(
-            children: [
-              Expanded(child: FlatButton(
-                onPressed: () {
-                  nextQuestion();
-                },
-                child: Text('Next'),
-                color: Colors.blueAccent,
-              ),
-              ),
-              SizedBox(width: 2,),
-              index == 0 ? Container() : Expanded(child: FlatButton(
-                onPressed: () {
-                  index == 0 ? null : prevQuestion();
-                },
-                child: Text('Previous'),
-                color: Colors.cyan,
-              ),
-              ),
-              SizedBox(width: 2,),
-              Expanded(child: FlatButton(
-                onPressed: () {
-                  showCloseExamDialog();
-                },
-                child: Text('End Test'),
-                color: Colors.red,
-              ),
-              ),
-            ],
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: Row(
+              children: [
+                Expanded(
+                  child: FlatButton(
+                    onPressed: _questions[_index].selectedAnswer == null
+                        ? null
+                        : () {
+                            setState(() {
+                              _questions[_index].flagged = true;
+                              _questions[_index].marked = false;
+                            });
+                            if (_autoNext) nextQuestion();
+                          },
+                    child: Text('Flag'.toUpperCase()),
+                    color: Colors.orange,
+                    textColor: Colors.white,
+                    disabledColor: Theme.of(context).disabledColor,
+                  ),
+                ),
+                SizedBox(width: 10),
+                Expanded(
+                  child: FlatButton(
+                    onPressed: _questions[_index].selectedAnswer == null
+                        ? () {
+                            setState(() {
+                              _questions[_index].flagged = false;
+                              _questions[_index].marked = true;
+                            });
+                            if (_autoNext) nextQuestion();
+                          }
+                        : null,
+                    child: Text('Mark'.toUpperCase()),
+                    color: Colors.indigo,
+                    textColor: Colors.white,
+                    disabledColor: Theme.of(context).disabledColor,
+                  ),
+                ),
+              ],
+            ),
           ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: Row(
+              children: [
+                Expanded(
+                  child: FlatButton(
+                    onPressed: () {
+                      showCloseExamDialog();
+                    },
+                    child: Text('End'.toUpperCase()),
+                    color: Colors.red,
+                    textColor: Colors.white,
+                  ),
+                ),
+                SizedBox(width: 10),
+                Expanded(
+                  child: OutlineButton(
+                    textColor: Theme.of(context).accentColor,
+                    borderSide: BorderSide(
+                      color: Theme.of(context).accentColor,
+                    ),
+                    onPressed: _index == 0
+                        ? null
+                        : () {
+                            prevQuestion();
+                          },
+                    child: Text('Prev'.toUpperCase()),
+                    color: Colors.cyan,
+                  ),
+                ),
+                SizedBox(width: 10),
+                Expanded(
+                  child: FlatButton(
+                    onPressed: nextQuestion,
+                    child: Text('Next'.toUpperCase()),
+                    color: Theme.of(context).accentColor,
+                    textColor: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: 10),
         ],
       ),
-    ),
     );
   }
-
-  Instruction(String heading, String text) {
-    return Text('* ${heading}: ${text}', style: TextStyle(
-      fontSize: 14,
-    ),);
-  }
-
-  NavigationTool(String button, String text) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        RaisedButton(
-          color: Colors.green,
-          child: Text('${button}'),
-          onPressed: () {},
-        ),
-        Text('${text}', style: TextStyle(
-          fontSize: 14,
-        ),)
-      ],
-    );
-  }
-
-  StandardInstructions(String text) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Text('$text', style: TextStyle(fontSize: 14,),),
-    );
-  }
-
 }
 
+class AnswerRadio extends StatelessWidget {
+  final String text;
+  final bool selected;
+  final bool correctAnswer;
+  final bool completed;
+  final bool showAnswer;
+  final VoidCallback onSelect;
+
+  const AnswerRadio(
+    this.text, {
+    Key key,
+    this.showAnswer = false,
+    this.selected = false,
+    this.correctAnswer = false,
+    this.completed = false,
+    this.onSelect,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: selected ? Theme.of(context).accentColor.withOpacity(0.1) : null,
+      child: InkWell(
+        onTap: completed ? null : onSelect,
+        child: Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  text,
+                  style: TextStyle(
+                    color: selected ? Theme.of(context).accentColor : null,
+                  ),
+                ),
+              ),
+              SizedBox(width: 7.5),
+              _getIcon(context),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Icon _getIcon(BuildContext context) {
+    if (showAnswer && completed) {
+      if (correctAnswer) {
+        return Icon(
+          FluentSystemIcons.ic_fluent_checkmark_circle_filled,
+          color: Colors.green,
+        );
+      }
+      return Icon(
+        FluentSystemIcons.ic_fluent_dismiss_circle_filled,
+        color: Colors.red,
+      );
+    }
+    if (selected) {
+      return Icon(
+        FluentSystemIcons.ic_fluent_checkmark_circle_filled,
+        color: Theme.of(context).accentColor,
+      );
+    }
+    return Icon(
+      FluentSystemIcons.ic_fluent_checkmark_circle_regular,
+      color: Theme.of(context).dividerColor,
+    );
+  }
+}
