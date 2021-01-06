@@ -75,5 +75,9 @@ class Session {
 
   static set locale(String v) => _pref?.setString("app_locale", v);
 
+  static set auth(String v) => _pref?.setString("auth", v);
+
+  static get auth => _pref?.getString("auth");
+
   static logout() => _pref?.clear();
 }

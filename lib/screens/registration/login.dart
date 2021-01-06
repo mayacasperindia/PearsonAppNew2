@@ -12,7 +12,8 @@ import 'package:pearson_flutter/widgets/my_scaffold.dart';
 import 'package:url_launcher/url_launcher.dart';
 // import 'package:shared_preferences/shared_preferences.dart';
 
-class LoginPage extends StatefulWidget {
+class
+LoginPage extends StatefulWidget {
   @override
   _LoginPageState createState() => _LoginPageState();
 }
@@ -176,7 +177,7 @@ class _LoginPageState extends State<LoginPage> {
                         SizedBox(width: 5),
                         InkWell(
                           onTap: () =>
-                              AppConfig.goto(context, SignUp(), replace: true),
+                              AppConfig.goto(context, VoucherCheck(), replace: true),
                           child: Text(
                             "Sign up",textScaleFactor: 1.2,
                             style: TextStyle(

@@ -98,7 +98,7 @@ class _ForgetPwState extends State<ForgetPw> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => DetailPage()),
+                                  builder: (context) => SignUp()),
                             ),
                           },
                           child: InkWell(
