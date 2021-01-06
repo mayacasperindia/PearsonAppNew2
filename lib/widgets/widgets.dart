@@ -1,3 +1,4 @@
+import 'package:fluentui_icons/fluentui_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -82,9 +83,10 @@ class InputField extends StatelessWidget {
                         child: Text(
                           label.toUpperCase(),
                           textScaleFactor: 0.9,
+                          maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            fontWeight: FontWeight.normal,
+                            fontWeight: FontWeight.w300,
                             fontSize: 11,
                             color: Theme.of(context)
                                 .textTheme
@@ -240,6 +242,170 @@ class RCard extends StatelessWidget {
           child: child,
           padding: padding ?? EdgeInsets.zero,
         ),
+      ),
+    );
+  }
+}
+
+class Dot extends StatelessWidget {
+  final Brightness brightness;
+  final double size;
+
+  const Dot({Key key, this.brightness = Brightness.light, this.size = 5})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Theme(
+      data: Theme.of(context).copyWith(brightness: brightness),
+      child: Container(
+        width: size,
+        height: size,
+        margin: EdgeInsets.all(5),
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: Theme.of(context).dividerColor,
+        ),
+      ),
+    );
+  }
+}
+
+class SectioTitle extends StatelessWidget {
+  final String text;
+
+  const SectioTitle(this.text, {Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Theme.of(context).backgroundColor,
+      width: double.maxFinite,
+      padding: const EdgeInsets.only(left: 10, right: 10, top: 7.5, bottom: 5),
+      child: Text(
+        text.toUpperCase(),
+        style: TextStyle(fontWeight: FontWeight.bold),
+      ),
+    );
+  }
+}
+
+class ULText extends StatelessWidget {
+  final String text;
+  final Widget bullet;
+
+  const ULText(this.text, {Key key, this.bullet}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(10),
+      child: Row(
+        crossAxisAlignment: text.length < 50
+            ? CrossAxisAlignment.center
+            : CrossAxisAlignment.start,
+        children: [
+          bullet ?? Text("»"),
+          SizedBox(width: 7.5),
+          Expanded(child: Text('$text')),
+        ],
+      ),
+    );
+  }
+}
+
+class LegendTile extends StatelessWidget {
+  final String text;
+  final Color color;
+
+  const LegendTile(this.text, this.color, {Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 5),
+      child: Chip(
+        label: Text(text),
+        avatar: Container(
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(AppConfig.kRadiusSmall),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class BulletButton extends StatelessWidget {
+  final String text;
+  final Color color;
+  final bool bordered;
+
+  BulletButton(this.text, {this.color, this.bordered = false, Key key})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      shape: RoundedRectangleBorder(
+        side: bordered
+            ? BorderSide(color: color ?? Theme.of(context).accentColor)
+            : BorderSide.none,
+        borderRadius: BorderRadius.circular(AppConfig.kRadiusSmallest),
+      ),
+      color: bordered
+          ? Colors.transparent
+          : color ?? Theme.of(context).accentColor,
+      child: Padding(
+        padding: const EdgeInsets.all(5.0),
+        child: Text(
+          text.toUpperCase(),
+          textScaleFactor: 0.8,
+          style: TextStyle(
+            fontWeight: FontWeight.w900,
+            color: bordered
+                ? color ?? Theme.of(context).accentColor
+                : Colors.white,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class LabelValueHolder extends StatelessWidget {
+  final String label;
+  final String value;
+  final IconData icon;
+
+  const LabelValueHolder(this.label, this.value, {Key key, this.icon})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+      child: Row(
+        children: [
+          Icon(icon ?? FluentSystemIcons.ic_fluent_arrow_right_circle_regular),
+          SizedBox(width: 7.5),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: Theme.of(context).textTheme.caption,
+                ),
+                Text(
+                  value,
+                  style: Theme.of(context).textTheme.bodyText1,
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

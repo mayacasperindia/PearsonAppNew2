@@ -1,16 +1,26 @@
 import 'package:fluentui_icons/fluentui_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:pearson_flutter/screens/exercise/exerciseScreen.dart';
+import 'package:pearson_flutter/utils/config.dart';
+import 'package:pearson_flutter/widgets/bottom_sheet.dart';
 import 'package:pearson_flutter/widgets/widgets.dart';
 
-class UnitTestItem extends StatelessWidget {
+class UnitTestItem extends StatefulWidget {
   final bool enabled;
 
   const UnitTestItem({Key key, this.enabled = true}) : super(key: key);
 
   @override
+  _UnitTestItemState createState() => _UnitTestItemState();
+}
+
+class _UnitTestItemState extends State<UnitTestItem> {
+  BottomSheetWidget syllabusModal = new BottomSheetWidget();
+
+  @override
   Widget build(BuildContext context) {
     return RCard(
-      color: enabled
+      color: widget.enabled
           ? Theme.of(context).accentColor
           : Theme.of(context).disabledColor,
       elevation: 0,
@@ -31,7 +41,7 @@ class UnitTestItem extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  enabled ? 'Frequency 0/3' : "Frequency 3/3",
+                  widget.enabled ? 'Frequency 0/3' : "Frequency 3/3",
                   style: TextStyle(
                     fontWeight: FontWeight.w300,
                     color: Colors.white,
@@ -41,7 +51,7 @@ class UnitTestItem extends StatelessWidget {
                 SizedBox(
                   height: 24,
                   child: FlatButton(
-                    onPressed: () {},
+                    onPressed: () => syllabusModal.mainBottomSheet(context),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -65,10 +75,15 @@ class UnitTestItem extends StatelessWidget {
               ],
             ),
           ),
-          Icon(
-            FluentSystemIcons.ic_fluent_arrow_right_circle_filled,
-            color: enabled ? Colors.white : Colors.white30,
-            size: 32,
+          IconButton(
+            icon: Icon(
+              FluentSystemIcons.ic_fluent_arrow_right_circle_filled,
+              color: widget.enabled ? Colors.white : Colors.white30,
+              size: 32,
+            ),
+            onPressed: () {
+              AppConfig.goto(context, ExerciseScreen(unit: true,));
+            },
           )
         ],
       ),

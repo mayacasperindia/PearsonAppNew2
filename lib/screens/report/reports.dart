@@ -19,8 +19,7 @@ class Reports extends StatefulWidget {
   _ReportsState createState() => _ReportsState();
 }
 
-class _ReportsState extends State<Reports>
-    with SingleTickerProviderStateMixin {
+class _ReportsState extends State<Reports> with SingleTickerProviderStateMixin {
   TabController _tabController;
 
   String _selectedSyllabus;
@@ -66,7 +65,7 @@ class _ReportsState extends State<Reports>
   void initState() {
     _tabController = TabController(length: 6, vsync: this);
     if (widget.syllabus?.isNotEmpty ?? false)
-      _selectedSyllabus = widget.syllabus[0];
+      _selectedSyllabus = widget.syllabus[1];
     super.initState();
   }
 
@@ -106,12 +105,39 @@ class _ReportsState extends State<Reports>
     return NestedScrollView(
       body: TabBarView(
         children: [
-          ReportDropdown(subject: _subject, topic: _topic, chapter: _chapter, attempt: _attempt,),
-          ReportDropdown(subject: _subject, chapter: _chapter, topic: _topic, attempt: _attempt,),
-          ReportDropdown(subject: _subject, chapter: _chapter, test: _test, attempt: _attempt,),
-          ReportDropdown(classes: _classes, test: _test, attempt: _attempt,),
-          ReportDropdown(classes: _classes, test: _test, attempt: _attempt,),
-          ReportDropdown(classes: _classes, mode: _mode, test: _test, attempt: _attempt,),
+          ReportDropdown(
+            subject: _subject,
+            topic: _topic,
+            chapter: _chapter,
+            attempt: _attempt,
+          ),
+          ReportDropdown(
+            subject: _subject,
+            chapter: _chapter,
+            topic: _topic,
+            attempt: _attempt,
+          ),
+          ReportDropdown(
+            subject: _subject,
+            chapter: _chapter,
+            test: _test,
+            attempt: _attempt,
+          ),
+          ReportDropdown(
+            test: _test,
+            attempt: _attempt,
+          ),
+          ReportDropdown(
+            classes: _classes,
+            test: _test,
+            attempt: _attempt,
+          ),
+          ReportDropdown(
+            classes: _classes,
+            mode: _mode,
+            test: _test,
+            attempt: _attempt,
+          ),
         ],
         controller: _tabController,
       ),
@@ -155,9 +181,7 @@ class _ReportsState extends State<Reports>
   }
 }
 
-
 class ReportDropdown extends StatefulWidget {
-
   final List<String> subject;
   final List<String> topic;
   final List<String> chapter;
@@ -165,7 +189,6 @@ class ReportDropdown extends StatefulWidget {
   final List<String> classes;
   final List<String> mode;
   final List<String> test;
-
 
   ReportDropdown(
       {this.subject,
@@ -181,7 +204,6 @@ class ReportDropdown extends StatefulWidget {
 }
 
 class _ReportDropdownState extends State<ReportDropdown> {
-
   String subjectPicker;
   String topicPicker;
   String chapterPicker;
@@ -201,64 +223,64 @@ class _ReportDropdownState extends State<ReportDropdown> {
               children: <Widget>[
                 if (widget.subject?.isNotEmpty ?? false)
                   ReportsPicker(
-                  subject: widget.subject,
-                  select: 'Select Subject',
-                  onChange: (v) {
-                    setState(() {
-                      subjectPicker = v;
-                    });
-                  },
-                ),
+                    subject: widget.subject,
+                    select: 'Select Subject',
+                    onChange: (v) {
+                      setState(() {
+                        subjectPicker = v;
+                      });
+                    },
+                  ),
                 if (widget.topic?.isNotEmpty ?? false)
                   ReportsPicker(
-                  subject: widget.topic,
+                    subject: widget.topic,
                     select: 'Select Topic',
-                  onChange: (v) {
-                    setState(() {
-                      topicPicker = v;
-                    });
-                  },
-                ),
+                    onChange: (v) {
+                      setState(() {
+                        topicPicker = v;
+                      });
+                    },
+                  ),
                 if (widget.chapter?.isNotEmpty ?? false)
                   ReportsPicker(
-                  subject: widget.chapter,
+                    subject: widget.chapter,
                     select: 'Select Chapter',
-                  onChange: (v) {
-                    setState(() {
-                      chapterPicker = v;
-                    });
-                  },
-                ),
+                    onChange: (v) {
+                      setState(() {
+                        chapterPicker = v;
+                      });
+                    },
+                  ),
                 if (widget.classes?.isNotEmpty ?? false)
-                ReportsPicker(
-                  subject: widget.classes,
-                  select: 'Select Classes',
-                  onChange: (v) {
-                    setState(() {
-                      classPicker = v;
-                    });
-                  },
-                ),
+                  ReportsPicker(
+                    subject: widget.classes,
+                    select: 'Select Classes',
+                    onChange: (v) {
+                      setState(() {
+                        classPicker = v;
+                      });
+                    },
+                  ),
                 if (widget.mode?.isNotEmpty ?? false)
                   ReportsPicker(
-                  subject: widget.mode,
+                    subject: widget.mode,
                     select: 'Select Mode',
-                  onChange: (v) {
-                    setState(() {
-                      modePicker = v;
-                    });
-                  },
-                ),
+                    onChange: (v) {
+                      setState(() {
+                        modePicker = v;
+                      });
+                    },
+                  ),
                 if (widget.test?.isNotEmpty ?? false)
                   ReportsPicker(
-                  subject: widget.test,
+                    subject: widget.test,
                     select: 'Select Test',
-                  onChange: (v) {
-                    setState(() {
-                      testPicker = v;
-                    });
-                  },
-                ),
+                    onChange: (v) {
+                      setState(() {
+                        testPicker = v;
+                      });
+                    },
+                  ),
                 if (widget.attempt?.isNotEmpty ?? false)
                   ReportsPicker(
                     subject: widget.attempt,
@@ -269,62 +291,22 @@ class _ReportDropdownState extends State<ReportDropdown> {
                       });
                     },
                   ),
-
               ],
             ),
             if (attemptPicker != 'Not Selected' ?? false)
-            Column(
-              children: [
-                Container(
-                  padding: EdgeInsets.only(top: 15),
-                  child: Text('Your Report', textAlign: TextAlign.center, textScaleFactor: 1.3, style: TextStyle(
-                    fontWeight: FontWeight.w800,
-                  ),),
-                ),
-
-                Row(
-                  children: [
-                    Container(
-                        width: MediaQuery.of(context).size.width * 0.45,
-                        padding: EdgeInsets.all(10),
-                        child: CircularPercentIndicator(
-                          radius: MediaQuery.of(context).size.width * 0.25,
-                          lineWidth: 7,
-                          animation: true,
-                          percent: 60/100,
-                          center: Text("60.0%",style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 20.0),
-                          ),
-                          footer: Text("Total", style:TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 17.0),
-                          ),
-                          backgroundColor: Colors.black12,
-                          circularStrokeCap: CircularStrokeCap.round,
-                          progressColor: Theme.of(context).buttonColor,
-                        )
+              Column(
+                children: [
+                  Container(
+                    padding: EdgeInsets.only(top: 15),
+                    child: Text(
+                      'Your Report',
+                      textAlign: TextAlign.center,
+                      textScaleFactor: 1.3,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w800,
+                      ),
                     ),
-                    Container(
-                        width: MediaQuery.of(context).size.width * 0.45,
-                        padding: EdgeInsets.all(10),
-                        child: CircularPercentIndicator(
-                          radius: MediaQuery.of(context).size.width * 0.25,
-                          lineWidth: 7,
-                          animation: true,
-                          percent: 60/100,
-                          center: Text("60.0%",style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 20.0),
-                          ),
-                          footer: Text("Correct", style:TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 17.0),
-                          ),
-                          backgroundColor: Colors.black12,
-                          circularStrokeCap: CircularStrokeCap.round,
-                          progressColor: Colors.green,
-                        )
-                    ),
-                  ],
-                ),
-                if (testPicker != 'Not Selected' ?? false)
+                  ),
                   Row(
                     children: [
                       Container(
@@ -334,107 +316,176 @@ class _ReportDropdownState extends State<ReportDropdown> {
                             radius: MediaQuery.of(context).size.width * 0.25,
                             lineWidth: 7,
                             animation: true,
-                            percent: 40/100,
-                            center: Text("40.0%",style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 20.0),
+                            percent: 60 / 100,
+                            center: Text(
+                              "60.0%",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 20.0),
                             ),
-                            footer: Text("Attempt", style:TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 17.0),
-                            ),
-                            backgroundColor: Colors.black12,
-                            circularStrokeCap: CircularStrokeCap.round,
-                            progressColor: Colors.redAccent,
-                          )
-                      ),
-                      Container(
-                          width: MediaQuery.of(context).size.width * 0.45,
-                          padding: EdgeInsets.all(10),
-                          child: CircularPercentIndicator(
-                            radius: MediaQuery.of(context).size.width * 0.25,
-                            lineWidth: 7,
-                            animation: true,
-                            percent: 90/100,
-                            center: Text("90%",style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 20.0),
-                            ),
-                            footer: Text("Skipped", style:TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 17.0),
-                            ),
-                            backgroundColor: Colors.black12,
-                            circularStrokeCap: CircularStrokeCap.round,
-                            progressColor: Colors.cyan,
-                          )
-                      ),
-                    ],
-                  ),
-                Row(
-                  children: [
-                    if (testPicker == 'Not Selected' ?? true)
-                      Container(
-                        width: MediaQuery.of(context).size.width * 0.45,
-                        padding: EdgeInsets.all(10),
-                        child: CircularPercentIndicator(
-                          radius: MediaQuery.of(context).size.width * 0.25,
-                          lineWidth: 7,
-                          animation: true,
-                          percent: 40/100,
-                          center: Text("40.0%",style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 20.0),
-                          ),
-                          footer: Text("Incorrect", style:TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 17.0),
-                          ),
-                          backgroundColor: Colors.black12,
-                          circularStrokeCap: CircularStrokeCap.round,
-                          progressColor: Colors.redAccent,
-                        )
-                    ),
-
-                    if (testPicker != 'Not Selected' ?? false)
-                      Container(
-                          width: MediaQuery.of(context).size.width * 0.45,
-                          padding: EdgeInsets.all(10),
-                          child: CircularPercentIndicator(
-                            radius: MediaQuery.of(context).size.width * 0.25,
-                            lineWidth: 7,
-                            animation: true,
-                            percent: 360/500,
-                            center: Text("360",style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 20.0),
-                            ),
-                            footer: Text("Mark", style:TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 17.0),
+                            footer: Text(
+                              "Total",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 17.0),
                             ),
                             backgroundColor: Colors.black12,
                             circularStrokeCap: CircularStrokeCap.round,
                             progressColor: Theme.of(context).buttonColor,
-                          )
-                      ),
-
-                    Container(
-                        width: MediaQuery.of(context).size.width * 0.45,
-                        padding: EdgeInsets.all(10),
-                        child: CircularPercentIndicator(
-                          radius: MediaQuery.of(context).size.width * 0.25,
-                          lineWidth: 7,
-                          animation: true,
-                          percent: 90/100,
-                          center: Text("90%",style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 20.0),
-                          ),
-                          footer: Text("Time", style:TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 17.0),
-                          ),
-                          backgroundColor: Colors.black12,
-                          circularStrokeCap: CircularStrokeCap.round,
-                          progressColor: Colors.cyan,
-                        )
+                          )),
+                      Container(
+                          width: MediaQuery.of(context).size.width * 0.45,
+                          padding: EdgeInsets.all(10),
+                          child: CircularPercentIndicator(
+                            radius: MediaQuery.of(context).size.width * 0.25,
+                            lineWidth: 7,
+                            animation: true,
+                            percent: 60 / 100,
+                            center: Text(
+                              "60.0%",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 20.0),
+                            ),
+                            footer: Text(
+                              "Correct",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 17.0),
+                            ),
+                            backgroundColor: Colors.black12,
+                            circularStrokeCap: CircularStrokeCap.round,
+                            progressColor: Colors.green,
+                          )),
+                    ],
+                  ),
+                  if (testPicker != 'Not Selected' ?? false)
+                    Row(
+                      children: [
+                        Container(
+                            width: MediaQuery.of(context).size.width * 0.45,
+                            padding: EdgeInsets.all(10),
+                            child: CircularPercentIndicator(
+                              radius: MediaQuery.of(context).size.width * 0.25,
+                              lineWidth: 7,
+                              animation: true,
+                              percent: 40 / 100,
+                              center: Text(
+                                "40.0%",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 20.0),
+                              ),
+                              footer: Text(
+                                "Attempt",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 17.0),
+                              ),
+                              backgroundColor: Colors.black12,
+                              circularStrokeCap: CircularStrokeCap.round,
+                              progressColor: Colors.redAccent,
+                            )),
+                        Container(
+                            width: MediaQuery.of(context).size.width * 0.45,
+                            padding: EdgeInsets.all(10),
+                            child: CircularPercentIndicator(
+                              radius: MediaQuery.of(context).size.width * 0.25,
+                              lineWidth: 7,
+                              animation: true,
+                              percent: 90 / 100,
+                              center: Text(
+                                "90%",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 20.0),
+                              ),
+                              footer: Text(
+                                "Skipped",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 17.0),
+                              ),
+                              backgroundColor: Colors.black12,
+                              circularStrokeCap: CircularStrokeCap.round,
+                              progressColor: Colors.cyan,
+                            )),
+                      ],
                     ),
-                  ],
-                ),
-
-              ],
-            )
+                  Row(
+                    children: [
+                      if (testPicker == 'Not Selected' ?? true)
+                        Container(
+                            width: MediaQuery.of(context).size.width * 0.45,
+                            padding: EdgeInsets.all(10),
+                            child: CircularPercentIndicator(
+                              radius: MediaQuery.of(context).size.width * 0.25,
+                              lineWidth: 7,
+                              animation: true,
+                              percent: 40 / 100,
+                              center: Text(
+                                "40.0%",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 20.0),
+                              ),
+                              footer: Text(
+                                "Incorrect",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 17.0),
+                              ),
+                              backgroundColor: Colors.black12,
+                              circularStrokeCap: CircularStrokeCap.round,
+                              progressColor: Colors.redAccent,
+                            )),
+                      if (testPicker != 'Not Selected' ?? false)
+                        Container(
+                            width: MediaQuery.of(context).size.width * 0.45,
+                            padding: EdgeInsets.all(10),
+                            child: CircularPercentIndicator(
+                              radius: MediaQuery.of(context).size.width * 0.25,
+                              lineWidth: 7,
+                              animation: true,
+                              percent: 360 / 500,
+                              center: Text(
+                                "360",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 20.0),
+                              ),
+                              footer: Text(
+                                "Mark",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 17.0),
+                              ),
+                              backgroundColor: Colors.black12,
+                              circularStrokeCap: CircularStrokeCap.round,
+                              progressColor: Theme.of(context).buttonColor,
+                            )),
+                      Container(
+                          width: MediaQuery.of(context).size.width * 0.45,
+                          padding: EdgeInsets.all(10),
+                          child: CircularPercentIndicator(
+                            radius: MediaQuery.of(context).size.width * 0.25,
+                            lineWidth: 7,
+                            animation: true,
+                            percent: 90 / 100,
+                            center: Text(
+                              "90%",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 20.0),
+                            ),
+                            footer: Text(
+                              "Time",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 17.0),
+                            ),
+                            backgroundColor: Colors.black12,
+                            circularStrokeCap: CircularStrokeCap.round,
+                            progressColor: Colors.cyan,
+                          )),
+                    ],
+                  ),
+                ],
+              )
           ],
         ),
       ),

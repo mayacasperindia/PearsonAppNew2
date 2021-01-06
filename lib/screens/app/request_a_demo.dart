@@ -44,26 +44,23 @@ class _DialogPopupState extends State<DialogPopup> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(top:8.0),
-                                  child: Text(
-                                    "Ready to get started?",
-                                    style: Theme.of(context).textTheme.headline6,
+                                Text(
+                                  "Ready to get started?",
+                                  style: TextStyle(
+                                      color: Theme.of(context).primaryColor,
+                                      fontSize: 20
                                   ),
-                                ),
-                                SizedBox(
-                                  height: 10,
                                 ),
                                 Text(
                                   "Schedule a demo with us and start preparing students for their exams",
-                                  style: Theme.of(context).textTheme.caption,
+                                  style:
+                                  Theme.of(context).textTheme.caption,
                                 ),
                               ],
                             ),
                           ),
                           IconButton(
-                            icon: Icon(Icons.close,
-                                color: Theme.of(context).secondaryHeaderColor),
+                            icon: Icon(Icons.close, color: Theme.of(context).secondaryHeaderColor),
                             onPressed: () {
                               Navigator.pop(context);
                             },
@@ -86,9 +83,10 @@ class _DialogPopupState extends State<DialogPopup> {
                                         required: true,
                                         textColor: Colors.black,
                                         lessRightMargin: true,
-                                        suffixIcon: CupertinoIcons.person,
+                                        suffixIcon:
+                                        CupertinoIcons.person,
                                         capitalization:
-                                            TextCapitalization.words,
+                                        TextCapitalization.words,
                                       ),
                                     ),
                                     Expanded(
@@ -98,9 +96,10 @@ class _DialogPopupState extends State<DialogPopup> {
                                         fillColor: Colors.white,
                                         textColor: Colors.black,
                                         capitalization:
-                                            TextCapitalization.words,
+                                        TextCapitalization.words,
                                         lessLeftMargin: true,
-                                        suffixIcon: CupertinoIcons.person,
+                                        suffixIcon:
+                                        CupertinoIcons.person,
                                       ),
                                     ),
                                   ],
@@ -113,7 +112,8 @@ class _DialogPopupState extends State<DialogPopup> {
                                   required: true,
                                   textColor: Colors.black,
                                   formatter: [
-                                    LengthLimitingTextInputFormatter(40),
+                                    LengthLimitingTextInputFormatter(
+                                        40),
                                   ],
                                 ),
                                 InputField(
@@ -124,7 +124,8 @@ class _DialogPopupState extends State<DialogPopup> {
                                   required: true,
                                   textColor: Colors.black,
                                   formatter: [
-                                    LengthLimitingTextInputFormatter(25),
+                                    LengthLimitingTextInputFormatter(
+                                        25),
                                   ],
                                 ),
                                 Row(
@@ -139,7 +140,7 @@ class _DialogPopupState extends State<DialogPopup> {
                                         lessRightMargin: true,
                                         // suffixIcon: CupertinoIcons.person,
                                         capitalization:
-                                            TextCapitalization.words,
+                                        TextCapitalization.words,
                                       ),
                                     ),
                                     Expanded(
@@ -150,7 +151,7 @@ class _DialogPopupState extends State<DialogPopup> {
                                         fillColor: Colors.white,
                                         textColor: Colors.black,
                                         capitalization:
-                                            TextCapitalization.words,
+                                        TextCapitalization.words,
                                         lessLeftMargin: true,
                                         // suffixIcon: CupertinoIcons.person,
                                       ),
@@ -168,7 +169,7 @@ class _DialogPopupState extends State<DialogPopup> {
                                         lessRightMargin: true,
                                         // suffixIcon: CupertinoIcons.person,
                                         capitalization:
-                                            TextCapitalization.words,
+                                        TextCapitalization.words,
                                       ),
                                     ),
                                     Expanded(
@@ -179,7 +180,7 @@ class _DialogPopupState extends State<DialogPopup> {
                                         fillColor: Colors.white,
                                         textColor: Colors.black,
                                         capitalization:
-                                            TextCapitalization.words,
+                                        TextCapitalization.words,
                                         lessLeftMargin: true,
                                         // suffixIcon: CupertinoIcons.person,
                                       ),
@@ -188,10 +189,12 @@ class _DialogPopupState extends State<DialogPopup> {
                                 ),
                                 RaisedButton(
                                   shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(18.0),
+                                      borderRadius:
+                                      BorderRadius.circular(18.0),
                                       side: BorderSide(
-                                        color: Theme.of(context).buttonColor,
-                                      )),
+                                          color: Theme.of(context).buttonColor,
+                                      )
+                                  ),
                                   elevation: 5,
                                   color: Theme.of(context).buttonColor,
                                   padding: const EdgeInsets.all(10),
@@ -201,14 +204,15 @@ class _DialogPopupState extends State<DialogPopup> {
                                     Navigator.pushReplacement(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) => HomePage()),
+                                          builder: (context) =>
+                                              HomePage()),
                                     );
                                   },
                                   child: Text(
                                     'Request a Demo',
                                     style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
                                       color: Colors.white,
                                     ),
                                   ),

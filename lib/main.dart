@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pearson_flutter/events/authentication_events.dart';
 import 'package:pearson_flutter/homepage.dart';
 import 'package:pearson_flutter/providers/app_settings.dart';
+import 'package:pearson_flutter/screens/exercise/answer_status.dart';
 import 'package:pearson_flutter/screens/registration/login.dart';
 import 'package:pearson_flutter/splash_screen.dart';
 import 'package:pearson_flutter/states/authentication_states.dart';
@@ -372,6 +373,10 @@ class MyApp extends StatelessWidget {
           theme: _theme,
           darkTheme: _darkTheme,
           themeMode: ThemeMode.light,
+          routes: {
+            "/home": (_) => HomePage(),
+            "/report": (_) => AnswerStatus(),
+          },
           // themeMode: settings.themeMode,
           // supportedLocales: [
           //   Locale('en', 'US'),

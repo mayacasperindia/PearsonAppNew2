@@ -5,8 +5,6 @@ import 'package:flutter/painting.dart';
 import 'package:pearson_flutter/screens/app/account.dart';
 import 'package:pearson_flutter/screens/diagnosis/diagnosis_home.dart';
 import 'package:pearson_flutter/screens/practice/practice_home.dart';
-import 'package:pearson_flutter/screens/registration/aacount_setting.dart';
-import 'package:pearson_flutter/screens/registration/add_voucher.dart';
 import 'package:pearson_flutter/screens/report/reports.dart';
 import 'package:pearson_flutter/screens/test_series/test_series_home.dart';
 import 'package:pearson_flutter/utils/config.dart';
@@ -77,24 +75,21 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  _onAccountTap() async {
+    _onAccountTap() async {
     var res = await AppConfig.animateTo(context, Account());
-    _accountMenuTap(res);
   }
 
   _accountMenuTap(AccountMenu menu) {
+    _panelController.close();
     switch (menu) {
       case AccountMenu.voucher:
-        AppConfig.presentDialogWithChild(context, DialogPopup2());
+        // TODO: Handle this case.
         break;
       case AccountMenu.lang_en:
         // TODO: Handle this case.
         break;
       case AccountMenu.lang_hi:
         // TODO: Handle this case.
-        break;
-      case AccountMenu.account:
-        AppConfig.presentDialogWithChild(context, AccountSetting());
         break;
       case AccountMenu.logout:
         AppConfig.presentDialog(
