@@ -7,12 +7,33 @@ import 'package:pearson_flutter/utils/config.dart';
 import 'package:pearson_flutter/widgets/widgets.dart';
 import 'package:pearson_flutter/widgets/my_scaffold.dart';
 
-class DetailPage extends StatefulWidget {
+class SignUp extends StatefulWidget {
   @override
-  _DetailPageState createState() => _DetailPageState();
+  _SignUpState createState() => _SignUpState();
 }
 
-class _DetailPageState extends State<DetailPage> {
+class _SignUpState extends State<SignUp> {
+  var firstNameController,
+      lastNameController,
+      classController,
+      stateController,
+      schoolCityController,
+      boardController,
+      schoolNameController;
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    firstNameController = TextEditingController();
+    lastNameController = TextEditingController();
+    classController = TextEditingController();
+    stateController = TextEditingController();
+    schoolCityController = TextEditingController();
+    schoolNameController = TextEditingController();
+    // TODO: implement initState
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MyScaffold(
@@ -23,129 +44,185 @@ class _DetailPageState extends State<DetailPage> {
         elevation: 0,
       ),
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Center(
-              child: Image.asset(
-                "assets/images/login.png",
-                height: 160,
-              ),
-            ),
-            SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              child: Text(
-                "Signup with Myinsights",
-                style: Theme.of(context).textTheme.headline6,
-              ),
-            ),
-            SizedBox(height: 20),
-            Row(
-              children: <Widget>[
-                Expanded(
-                  child: InputField(
-                    label: "First Name",
-                    required: true,
-                    fillColor: Theme.of(context).canvasColor,
-                    lessRightMargin: true,
-                    suffixIcon: Icons.person,
-                    capitalization: TextCapitalization.words,
-                  ),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              Center(
+                child: Image.asset(
+                  "assets/images/login.png",
+                  height: 160,
                 ),
-                Expanded(
-                  child: InputField(
-                    label: "Last Name",
-                    fillColor: Theme.of(context).canvasColor,
-                    required: true,
-                    capitalization: TextCapitalization.words,
-                    lessLeftMargin: true,
-                    suffixIcon: Icons.person,
-                  ),
+              ),
+              SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15),
+                child: Text(
+                  "Signup with Myinsights",
+                  style: Theme.of(context).textTheme.headline6,
                 ),
-              ],
-            ),
-            InputField(
-              hint: "Select Board",
-              label: "Board",
-              fillColor: Theme.of(context).canvasColor,
-              required: true,
-              suffixIcon: Icons.layers,
-              capitalization: TextCapitalization.words,
-            ),
-            InputField(
-              hint: "eg. XII",
-              label: "Class",
-              required: true,
-              fillColor: Theme.of(context).canvasColor,
-              capitalization: TextCapitalization.words,
-              suffixIcon: Icons.confirmation_number,
-            ),
-            InputField(
-              label: "School State",
-              hint: "Select state",
-              required: true,
-              fillColor: Theme.of(context).canvasColor,
-              suffixIcon: Icons.map,
-              capitalization: TextCapitalization.words,
-            ),
-            InputField(
-              label: "School City",
-              hint: "Enter city name",
-              fillColor: Theme.of(context).canvasColor,
-              required: true,
-              capitalization: TextCapitalization.words,
-              suffixIcon: Icons.location_city,
-            ),
-            InputField(
-              hint: "Enter the School Name",
-              label: 'School Name',
-              suffixIcon: Icons.school,
-              required: true,
-              fillColor: Theme.of(context).canvasColor,
-              formatter: [
-                LengthLimitingTextInputFormatter(25),
-              ],
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              child: Wrap(
-                children: [
-                  Text(
-                    "By submitting, you agree to our ",
-                  ),
-                  InkWell(
-                    onTap: () {},
-                    child: Text(
-                      "Terms and Policy",
-                      style: TextStyle(
-                        color: Theme.of(context).accentColor,
-                        fontWeight: FontWeight.bold,
-                      ),
+              ),
+              SizedBox(height: 20),
+              Row(
+                children: <Widget>[
+                  Expanded(
+                    child: InputField(
+                      label: "First Name",
+                      controller: firstNameController,
+                      required: true,
+                      validator: (t) {
+                        if (t.trim().isEmpty) {
+                          return "Required Field";
+                        } else
+                          return null;
+                      },
+                      fillColor: Theme.of(context).canvasColor,
+                      lessRightMargin: true,
+                      suffixIcon: Icons.person,
+                      capitalization: TextCapitalization.words,
                     ),
                   ),
-                  Text("."),
+                  Expanded(
+                    child: InputField(
+                      label: "Last Name",
+                      controller: lastNameController,
+                      fillColor: Theme.of(context).canvasColor,
+                      required: true,
+                      validator: (t) {
+                        if (t.trim().isEmpty) {
+                          return "Required Field";
+                        } else
+                          return null;
+                      },
+                      capitalization: TextCapitalization.words,
+                      lessLeftMargin: true,
+                      suffixIcon: Icons.person,
+                    ),
+                  ),
                 ],
               ),
-            ),
-            SizedBox(height: 10),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              child: FractionallySizedBox(
-                widthFactor: 1,
-                child: RaisedButton(
-                  color: Theme.of(context).accentColor,
-                  padding: const EdgeInsets.all(10),
-                  textColor: Colors.white,
-                  onPressed: () => AppConfig.popGoto(context, HomePage()),
-                  child: Text('Submit'.toUpperCase()),
+              InputField(
+                hint: "Select Board",
+                label: "Board",
+                controller: boardController,
+                fillColor: Theme.of(context).canvasColor,
+                required: true,
+                validator: (t) {
+                  if (t.trim().isEmpty) {
+                    return "Required Field";
+                  } else
+                    return null;
+                },
+                suffixIcon: Icons.layers,
+                capitalization: TextCapitalization.words,
+              ),
+              InputField(
+                hint: "eg. XII",
+                label: "Class",
+                required: true,
+                controller: classController,
+                fillColor: Theme.of(context).canvasColor,
+                capitalization: TextCapitalization.words,
+                suffixIcon: Icons.confirmation_number,
+                validator: (t) {
+                  if (t.trim().isEmpty) {
+                    return "Required Field";
+                  } else
+                    return null;
+                },
+              ),
+              InputField(
+                label: "School State",
+                hint: "Select state",
+                required: true,
+                controller: stateController,
+                fillColor: Theme.of(context).canvasColor,
+                suffixIcon: Icons.map,
+                capitalization: TextCapitalization.words,
+                validator: (t) {
+                  if (t.trim().isEmpty) {
+                    return "Required Field";
+                  } else
+                    return null;
+                },
+              ),
+              InputField(
+                label: "School City",
+                hint: "Enter city name",
+                controller: schoolCityController,
+                fillColor: Theme.of(context).canvasColor,
+                required: true,
+                capitalization: TextCapitalization.words,
+                suffixIcon: Icons.location_city,
+                validator: (t) {
+                  if (t.trim().isEmpty) {
+                    return "Required Field";
+                  } else
+                    return null;
+                },
+              ),
+              InputField(
+                hint: "Enter the School Name",
+                label: 'School Name',
+                controller: schoolNameController,
+                suffixIcon: Icons.school,
+                required: true,
+                fillColor: Theme.of(context).canvasColor,
+                formatter: [
+                  LengthLimitingTextInputFormatter(25),
+                ],
+                validator: (t) {
+                  if (t.trim().isEmpty) {
+                    return "Required Field";
+                  } else
+                    return null;
+                },
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15),
+                child: Wrap(
+                  children: [
+                    Text(
+                      "By submitting, you agree to our ",
+                    ),
+                    InkWell(
+                      onTap: () {},
+                      child: Text(
+                        "Terms and Policy",
+                        style: TextStyle(
+                          color: Theme.of(context).accentColor,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    Text("."),
+                  ],
                 ),
               ),
-            ),
-            SizedBox(height: 10),
-          ],
+              SizedBox(height: 10),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15),
+                child: FractionallySizedBox(
+                  widthFactor: 1,
+                  child: RaisedButton(
+                    color: Theme.of(context).accentColor,
+                    padding: const EdgeInsets.all(10),
+                    textColor: Colors.white,
+                    onPressed: () {
+                      if (_formKey.currentState.validate()) {
+                        AppConfig.popGoto(context, HomePage());
+                      } else {}
+                    },
+                    child: Text('Submit'.toUpperCase()),
+                  ),
+                ),
+              ),
+              SizedBox(height: 10),
+            ],
+          ),
         ),
       ),
     );

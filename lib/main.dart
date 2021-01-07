@@ -1,23 +1,60 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pearson_flutter/events/authentication_events.dart';
 import 'package:pearson_flutter/homepage.dart';
 import 'package:pearson_flutter/providers/app_settings.dart';
 import 'package:pearson_flutter/screens/exercise/answer_status.dart';
 import 'package:pearson_flutter/screens/registration/login.dart';
+import 'package:pearson_flutter/splash_screen.dart';
+import 'package:pearson_flutter/states/authentication_states.dart';
 import 'package:pearson_flutter/utils/config.dart';
 import 'package:pearson_flutter/utils/session.dart';
 import 'package:provider/provider.dart';
 
+import 'blocs/authentication_bloc.dart';
+
+/// Custom [BlocObserver] which observes all bloc and cubit instances.
+class SimpleBlocObserver extends BlocObserver {
+  @override
+  void onEvent(Bloc bloc, Object event) {
+    print(event);
+    super.onEvent(bloc, event);
+  }
+
+  @override
+  void onChange(Cubit cubit, Change change) {
+    print(change);
+    super.onChange(cubit, change);
+  }
+
+  @override
+  void onTransition(Bloc bloc, Transition transition) {
+    print(transition);
+    super.onTransition(bloc, transition);
+  }
+
+  @override
+  void onError(Cubit cubit, Object error, StackTrace stackTrace) {
+    print(error);
+    super.onError(cubit, error, stackTrace);
+  }
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  Bloc.observer = SimpleBlocObserver();
   await Session.init();
-
+  var _authenticationBloc = AuthenticationBloc(AuthenticationUninitialized());
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider<AppSettings>(
           create: (_) => AppSettings(),
         ),
+        BlocProvider(create: (BuildContext context) {
+          return _authenticationBloc..add(AppStarted());
+        })
       ],
       child: MyApp(),
     ),
@@ -357,7 +394,16 @@ class MyApp extends StatelessWidget {
           //   '/splash': (context) => Splash(),
           // },
           debugShowCheckedModeBanner: false,
-          home: LoginPage(),
+          home: BlocBuilder<AuthenticationBloc, AuthenticationState>(
+            builder: (BuildContext context, AuthenticationState state) {
+              if (state is AuthenticationUninitialized) {
+                return SplashScreen();
+              } else if (state is AppLoggedIn) {
+                return HomePage();
+              } else
+                return LoginPage();
+            },
+          ),
         );
       },
     );

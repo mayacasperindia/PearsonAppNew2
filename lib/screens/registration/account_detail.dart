@@ -72,7 +72,7 @@ class _EmailPageState extends State<EmailPage> {
                   color: Theme.of(context).accentColor,
                   padding: const EdgeInsets.all(10),
                   textColor: Colors.white,
-                  onPressed: () => AppConfig.popGoto(context, DetailPage()),
+                  onPressed: () => AppConfig.popGoto(context, SignUp()),
                   child: Text('Next'.toUpperCase()),
                 ),
               ),
