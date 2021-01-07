@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pearson_flutter/homepage.dart';
+import 'package:pearson_flutter/screens/registration/account_detail.dart';
 import 'package:pearson_flutter/screens/registration/sign_up.dart';
 import 'package:pearson_flutter/screens/registration/login.dart';
 import 'package:pearson_flutter/utils/config.dart';
@@ -61,7 +62,7 @@ class _SignUpState extends State<SignUp> {
                   child: FlatButton(
                     color: Theme.of(context).accentColor,
                     textColor: Colors.white,
-                    onPressed: () => AppConfig.goto(context, DetailPage()),
+                    onPressed: () => AppConfig.goto(context, EmailPage()),
                     child: Text('Next'.toUpperCase()),
                   ),
                 ),
