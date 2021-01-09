@@ -9,6 +9,7 @@ import 'package:pearson_flutter/screens/exercise/information.dart';
 import 'package:pearson_flutter/screens/exercise/instruction_bottom_sheet.dart';
 import 'package:pearson_flutter/screens/exercise/sampleQuestionModel.dart';
 import 'package:pearson_flutter/utils/config.dart';
+import 'package:pearson_flutter/widgets/syllabus_picker.dart';
 import 'package:pearson_flutter/widgets/widgets.dart';
 import 'package:sticky_headers/sticky_headers.dart';
 
@@ -68,6 +69,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
   @override
   void initState() {
     super.initState();
+    print("prt : ${widget.proctoredTest} non ${widget.nonProctoredTest} unit=${widget.unit}");
     _init();
     _startTimer();
   }
@@ -104,7 +106,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
     if (_index < _questions.length - 1) {
       _gotoQuestion(_index + 1);
     } else {
-      if (_showAnswer || widget.preMeter ) {
+      if (_showAnswer || widget.preMeter) {
         showExerciseEnd();
       } else {
         showCloseExamDialog();
@@ -129,11 +131,14 @@ class _QuestionScreenState extends State<QuestionScreen> {
     );
   }
 
+  bool get _bottomPanel => widget.exercise || widget.preMeter;
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
         child: Scaffold(
           appBar: AppBar(
+            automaticallyImplyLeading: false,
             title: Text(_formatTime),
             bottom: _showPages
                 ? PreferredSize(
@@ -142,6 +147,10 @@ class _QuestionScreenState extends State<QuestionScreen> {
                   )
                 : null,
             actions: [
+              if ( widget.nonProctoredTest || widget.proctoredTest )
+              SyllabusPicker(
+                syllabus: ["Physics", "Chemistry", "Mathematics", "Biology"],
+              ),
               IconButton(
                 onPressed: () {
                   showInstructionDialog();
@@ -152,11 +161,11 @@ class _QuestionScreenState extends State<QuestionScreen> {
             elevation: 1,
           ),
           body: _body(),
-          bottomNavigationBar:
-              (widget.exercise || widget.preMeter) ? null : _buildOption(),
+          bottomNavigationBar: _bottomPanel ? null : _buildOption(),
         ),
         onWillPop: () async {
-          showCloseExamDialog();
+          AppConfig.presentMessage(context,
+              message: "Complete the test first!");
           return true;
         });
   }
@@ -282,69 +291,72 @@ class _QuestionScreenState extends State<QuestionScreen> {
                                       selected: e.selected,
                                       correctAnswer: e.isCorrectAnswer,
                                       completed: _questions[index].done,
+                                      showAnswer: _showAnswer,
                                     ),
                                     Divider(height: 1),
                                   ],
                                 ))
                             .toList(),
                       ),
-                      _showAnswer
-                          ? Container(
-                              decoration: BoxDecoration(
-                                  color: Colors.green.withOpacity(0.2),
-                                  borderRadius: BorderRadius.circular(
-                                      AppConfig.kRadiusSmall)),
-                              padding: EdgeInsets.symmetric(vertical: 10),
-                              margin: EdgeInsets.all(10),
-                              child: Column(
-                                children: [
-                                  LabelValueHolder(
-                                    "Correct Answer",
-                                    _questions[index].correctAnswer?.answer,
-                                    icon: FluentSystemIcons
-                                        .ic_fluent_checkmark_circle_regular,
-                                  ),
-                                  LabelValueHolder(
-                                    "Definition",
-                                    _questions[index].correctAnswer?.definition,
-                                    icon: FluentSystemIcons
-                                        .ic_fluent_text_description_regular,
-                                  ),
-                                ],
-                              ),
-                            )
-                          : SizedBox.shrink(),
-                      SizedBox(height: 20),
+                      SizedBox(height: 10),
                     ],
                   ),
                 ),
               ),
-              Row(
-                children: [
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: OutlineButton(
-                      child: Text(
-                        "Clear".toUpperCase(),
+              _bottomPanel
+                  ? Row(
+                      children: [
+                        SizedBox(width: 10),
+                        Expanded(
+                          child: OutlineButton(
+                            child: Text(
+                              "Clear".toUpperCase(),
+                            ),
+                            onPressed: _questions[index].selectedAnswer == null
+                                ? null
+                                : _questions[index].done
+                                    ? null
+                                    : () {
+                                        setState(() {
+                                          _questions[index].clearAnswer();
+                                        });
+                                      },
+                          ),
+                        ),
+                        SizedBox(width: 10),
+                        Expanded(
+                          child: _nextButton,
+                        ),
+                        SizedBox(width: 10),
+                      ],
+                    )
+                  : _buildNav(),
+              _showAnswer
+                  ? Container(
+                      decoration: BoxDecoration(
+                          color: Colors.green.withOpacity(0.2),
+                          borderRadius:
+                              BorderRadius.circular(AppConfig.kRadiusSmall)),
+                      padding: EdgeInsets.symmetric(vertical: 10),
+                      margin: EdgeInsets.all(10),
+                      child: Column(
+                        children: [
+                          LabelValueHolder(
+                            "Correct Answer",
+                            _questions[index].correctAnswer?.answer,
+                            icon: FluentSystemIcons
+                                .ic_fluent_checkmark_circle_regular,
+                          ),
+                          LabelValueHolder(
+                            "Solution",
+                            _questions[index].correctAnswer?.definition,
+                            icon: FluentSystemIcons
+                                .ic_fluent_text_description_regular,
+                          ),
+                        ],
                       ),
-                      onPressed: _questions[index].selectedAnswer == null
-                          ? null
-                          : _questions[index].done
-                              ? null
-                              : () {
-                                  setState(() {
-                                    _questions[index].clearAnswer();
-                                  });
-                                },
-                    ),
-                  ),
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: _nextButton,
-                  ),
-                  SizedBox(width: 10),
-                ],
-              )
+                    )
+                  : SizedBox.shrink(),
             ],
           );
         });
@@ -369,7 +381,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
         onPressed: () => nextQuestion(),
       );
     }
-    if (_showAnswer) {
+    if (widget.exercise) {
       return FlatButton(
         color: Colors.green,
         textColor: Colors.white,
@@ -482,6 +494,61 @@ class _QuestionScreenState extends State<QuestionScreen> {
 
   bool _autoNext = false;
 
+  _buildNav() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      child: Row(
+        children: [
+          Expanded(
+            child: OutlineButton(
+              textColor: Theme.of(context).accentColor,
+              borderSide: BorderSide(
+                color: Theme.of(context).accentColor,
+              ),
+              onPressed: _index == 0
+                  ? null
+                  : () {
+                      prevQuestion();
+                    },
+              child: Icon(FluentSystemIcons.ic_fluent_arrow_left_filled),
+              color: Colors.cyan,
+            ),
+          ),
+          SizedBox(width: 10),
+          Expanded(
+            child: OutlineButton(
+              child: Text(
+                "Clear".toUpperCase(),
+              ),
+              onPressed: _questions[_index].selectedAnswer == null
+                  ? null
+                  : _questions[_index].done
+                      ? null
+                      : () {
+                          setState(() {
+                            _questions[_index].clearAnswer();
+                          });
+                        },
+            ),
+          ),
+          SizedBox(width: 10),
+          Expanded(
+            child: FlatButton(
+              onPressed: nextQuestion,
+              child: Icon(_index == _questions.length - 1
+                  ? FluentSystemIcons.ic_fluent_checkmark_filled
+                  : FluentSystemIcons.ic_fluent_arrow_right_filled),
+              color: _index == _questions.length - 1
+                  ? AppConfig.kSuccessColor
+                  : Theme.of(context).accentColor,
+              textColor: Colors.white,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   _buildOption() {
     return Container(
       color: Theme.of(context).backgroundColor,
@@ -497,53 +564,6 @@ class _QuestionScreenState extends State<QuestionScreen> {
               "Auto Next",
               overflow: TextOverflow.ellipsis,
               textScaleFactor: 0.8,
-            ),
-            subtitle: Text(
-              "Automatically go to next question",
-              textScaleFactor: 0.8,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Row(
-              children: [
-                Expanded(
-                  child: FlatButton(
-                    onPressed: _questions[_index].selectedAnswer == null
-                        ? null
-                        : () {
-                            setState(() {
-                              _questions[_index].flagged = true;
-                              _questions[_index].marked = false;
-                            });
-                            if (_autoNext) nextQuestion();
-                          },
-                    child: Text('Flag'.toUpperCase()),
-                    color: Colors.orange,
-                    textColor: Colors.white,
-                    disabledColor: Theme.of(context).disabledColor,
-                  ),
-                ),
-                SizedBox(width: 10),
-                Expanded(
-                  child: FlatButton(
-                    onPressed: _questions[_index].selectedAnswer == null
-                        ? () {
-                            setState(() {
-                              _questions[_index].flagged = false;
-                              _questions[_index].marked = true;
-                            });
-                            if (_autoNext) nextQuestion();
-                          }
-                        : null,
-                    child: Text('Mark'.toUpperCase()),
-                    color: Colors.indigo,
-                    textColor: Colors.white,
-                    disabledColor: Theme.of(context).disabledColor,
-                  ),
-                ),
-              ],
             ),
           ),
           Padding(
@@ -562,27 +582,59 @@ class _QuestionScreenState extends State<QuestionScreen> {
                 ),
                 SizedBox(width: 10),
                 Expanded(
-                  child: OutlineButton(
-                    textColor: Theme.of(context).accentColor,
-                    borderSide: BorderSide(
-                      color: Theme.of(context).accentColor,
-                    ),
-                    onPressed: _index == 0
+                  child: FlatButton(
+                    onPressed: _questions[_index].selectedAnswer == null
                         ? null
                         : () {
-                            prevQuestion();
+                            setState(() {
+                              _questions[_index].flagged = true;
+                              _questions[_index].marked = false;
+                            });
+                            if (_autoNext) nextQuestion();
                           },
-                    child: Text('Prev'.toUpperCase()),
-                    color: Colors.cyan,
+                    child: Text('Flag'.toUpperCase()),
+                    color: _questions[_index].flagged
+                        ? AppConfig.kFlagColor
+                        : null,
+                    textColor: _questions[_index].flagged
+                        ? Colors.white
+                        : AppConfig.kFlagColor,
+                    shape: _questions[_index].selectedAnswer == null
+                        ? null
+                        : RoundedRectangleBorder(
+                            side: BorderSide(color: AppConfig.kFlagColor),
+                            borderRadius:
+                                BorderRadius.circular(AppConfig.kRadiusSmall),
+                          ),
+                    disabledColor: Theme.of(context).disabledColor,
                   ),
                 ),
                 SizedBox(width: 10),
                 Expanded(
                   child: FlatButton(
-                    onPressed: nextQuestion,
-                    child: Text('Next'.toUpperCase()),
-                    color: Theme.of(context).accentColor,
-                    textColor: Colors.white,
+                    onPressed: _questions[_index].selectedAnswer == null
+                        ? () {
+                            setState(() {
+                              _questions[_index].flagged = false;
+                              _questions[_index].marked = true;
+                            });
+                            if (_autoNext) nextQuestion();
+                          }
+                        : null,
+                    child: Text('Mark'.toUpperCase()),
+                    color:
+                        _questions[_index].marked ? AppConfig.kMarkColor : null,
+                    textColor: _questions[_index].marked
+                        ? Colors.white
+                        : AppConfig.kMarkColor,
+                    shape: _questions[_index].selectedAnswer != null
+                        ? null
+                        : RoundedRectangleBorder(
+                            side: BorderSide(color: AppConfig.kMarkColor),
+                            borderRadius:
+                                BorderRadius.circular(AppConfig.kRadiusSmall),
+                          ),
+                    disabledColor: Theme.of(context).disabledColor,
                   ),
                 ),
               ],

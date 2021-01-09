@@ -5,16 +5,16 @@ import 'package:pearson_flutter/utils/config.dart';
 import 'package:pearson_flutter/widgets/bottom_sheet.dart';
 import 'package:pearson_flutter/widgets/widgets.dart';
 
-class UnitTestItem extends StatefulWidget {
+class ProctoredTestItem extends StatefulWidget {
   final bool enabled;
 
-  const UnitTestItem({Key key, this.enabled = true}) : super(key: key);
+  const ProctoredTestItem({Key key, this.enabled = true}) : super(key: key);
 
   @override
-  _UnitTestItemState createState() => _UnitTestItemState();
+  _ProctoredTestItemState createState() => _ProctoredTestItemState();
 }
 
-class _UnitTestItemState extends State<UnitTestItem> {
+class _ProctoredTestItemState extends State<ProctoredTestItem> {
   BottomSheetWidget syllabusModal = new BottomSheetWidget();
 
   @override
@@ -92,7 +92,7 @@ class _UnitTestItemState extends State<UnitTestItem> {
 
               AppConfig.goto(
                 context,
-                ExerciseScreen(unit: true),
+                ExerciseScreen(proctoredTest: true, nonProctoredTest: true,),
               );
             },
           )

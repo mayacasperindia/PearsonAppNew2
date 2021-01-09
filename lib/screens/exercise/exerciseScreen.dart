@@ -21,14 +21,14 @@ class ExerciseScreen extends StatefulWidget {
 
   const ExerciseScreen(
       {Key key,
-      this.unit,
-      this.exercise,
-      this.preMeter,
-      this.practice,
-      this.chapter,
-      this.previousYear,
-      this.proctoredTest,
-      this.nonProctoredTest})
+        this.unit,
+        this.exercise,
+        this.preMeter,
+        this.practice,
+        this.chapter,
+        this.previousYear,
+        this.proctoredTest,
+        this.nonProctoredTest})
       : super(key: key);
 
   @override
@@ -88,30 +88,30 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
                   onPressed: secondsRemaining > 0
                       ? null
                       : () {
-                          if (_agreed) {
-                            AppConfig.goto(
-                                context,
-                                QuestionScreen(
-                                  preMeter: widget.preMeter ?? false,
-                                  exercise: widget.exercise ?? false,
-                                  chapter: widget.chapter ?? false,
-                                  nonProctoredTest:
-                                      widget.nonProctoredTest ?? false,
-                                  practice: widget.practice ?? false,
-                                  previousYear: widget.previousYear ?? false,
-                                  proctoredTest: widget.proctoredTest ?? false,
-                                  unit: widget.unit ?? false,
-                                ));
-                          } else {
-                            AppConfig.presentMessage(
-                              context,
-                              message:
-                                  "Please accept the terms and conditions!",
-                              icon: FluentSystemIcons.ic_fluent_warning_regular,
-                              iconColor: Theme.of(context).errorColor,
-                            );
-                          }
-                        },
+                    if (_agreed) {
+                      AppConfig.goto(
+                          context,
+                          QuestionScreen(
+                            preMeter: widget.preMeter ?? false,
+                            exercise: widget.exercise ?? false,
+                            chapter: widget.chapter ?? false,
+                            nonProctoredTest:
+                            widget.nonProctoredTest ?? false,
+                            practice: widget.practice ?? false,
+                            previousYear: widget.previousYear ?? false,
+                            proctoredTest: widget.proctoredTest ?? false,
+                            unit: widget.unit ?? false,
+                          ));
+                    } else {
+                      AppConfig.presentMessage(
+                        context,
+                        message:
+                        "Please accept the terms and conditions!",
+                        icon: FluentSystemIcons.ic_fluent_warning_regular,
+                        iconColor: Theme.of(context).errorColor,
+                      );
+                    }
+                  },
                   textColor: Theme.of(context).accentColor,
                   color: Colors.white,
                   disabledColor: Colors.grey,
@@ -133,8 +133,8 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
                       child: Text(
                         "T&Cs",
                         style: Theme.of(context).textTheme.caption.copyWith(
-                              color: secondsRemaining > 0 ? null : Colors.white,
-                            ),
+                          color: secondsRemaining > 0 ? null : Colors.white,
+                        ),
                       ),
                       onPressed: () {},
                     ),
@@ -150,8 +150,8 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
                       child: Text(
                         "Policy",
                         style: Theme.of(context).textTheme.caption.copyWith(
-                              color: secondsRemaining > 0 ? null : Colors.white,
-                            ),
+                          color: secondsRemaining > 0 ? null : Colors.white,
+                        ),
                       ),
                       onPressed: () {},
                     ),
@@ -265,7 +265,7 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
                 ULText(
                   'Wrong Answer Deducts: 1 mark',
                   bullet:
-                      Icon(FluentSystemIcons.ic_fluent_dismiss_circle_regular),
+                  Icon(FluentSystemIcons.ic_fluent_dismiss_circle_regular),
                 ),
               ],
             ),

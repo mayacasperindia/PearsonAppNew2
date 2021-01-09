@@ -6,6 +6,7 @@ import 'package:flutter/widgets.dart';
 import 'package:pearson_flutter/utils/page_routes.dart';
 import 'package:pearson_flutter/utils/session.dart';
 import 'package:url_launcher/url_launcher.dart';
+String globalSelectedSyllabus = 'NEET XI';
 
 class AppConfig {
   static Color kHeaderColor = Color(0xff027a9c);
@@ -21,6 +22,11 @@ class AppConfig {
   static Color kHintColorDark = Color(0xffdedede);
   static Color kDividerColorDark = Color(0xffbcbcbc);
   static Color kErrorColorDark = Color(0xffcd0909);
+
+  //Colors
+  static Color kSuccessColor = Color(0xff308887);
+  static Color kFlagColor = Colors.orange;
+  static Color kMarkColor = Colors.indigo;
 
   static double kRadius = 50.0;
   static double kRadiusSmall = 10.0;

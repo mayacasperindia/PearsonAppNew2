@@ -109,7 +109,7 @@ class DiagnosisSubjectItem extends StatelessWidget {
                               child: LinearProgressIndicator(
                                 minHeight: 12,
                                 value: 0.15,
-                                valueColor: AlwaysStoppedAnimation(Colors.indigo),
+                                valueColor: AlwaysStoppedAnimation(color ?? Colors.indigo),
                               ),
                             ),
                           ],

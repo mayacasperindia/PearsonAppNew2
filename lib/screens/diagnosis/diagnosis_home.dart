@@ -88,6 +88,7 @@ class _DiagnoseHomeState extends State<DiagnoseHome>
               onChange: (v) {
                 setState(() {
                   _selectedSyllabus = v;
+                  globalSelectedSyllabus = v;
                 });
               },
             ),
