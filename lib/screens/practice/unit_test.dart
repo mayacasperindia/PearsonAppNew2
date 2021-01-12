@@ -25,15 +25,7 @@ class _UnitTestState extends State<UnitTest> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: SyllabusPicker(
-          syllabus: widget.syllabus,
-          onChange: (v) {
-            setState(() {
-              _selectedSyllabus = v;
-              globalSelectedSyllabus = v;
-            });
-          },
-        ),
+        leading: Image.asset("assets/images/favicon.png"),
         actions: [
           Hero(
             tag: "account",

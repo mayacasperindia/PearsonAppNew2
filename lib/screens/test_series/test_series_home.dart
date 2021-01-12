@@ -73,14 +73,14 @@ class _TestSeriesHomeState extends State<TestSeriesHome>
             elevation: 1,
             titleSpacing: 0,
             centerTitle: false,
-            title: SyllabusPicker(
-              syllabus: widget.syllabus,
-              onChange: (v) {
-                setState(() {
-                  _selectedSyllabus = v;
-                });
-              },
-            ),
+            // title: SyllabusPicker(
+            //   syllabus: widget.syllabus,
+            //   onChange: (v) {
+            //     setState(() {
+            //       _selectedSyllabus = v;
+            //     });
+            //   },
+            // ),
             leading: Image.asset("assets/images/favicon.png"),
             bottom: makeTabBar(),
             actions: [

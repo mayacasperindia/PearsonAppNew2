@@ -53,17 +53,17 @@ class _HomePageState extends State<HomePage> {
     switch (_currentIndex) {
       case 1:
         return PracticeHome(
-          syllabus: _syllabus,
+          // syllabus: _syllabus,
           onAccountTap: _onAccountTap,
         );
       case 2:
         return TestSeriesHome(
-          syllabus: _syllabus,
+          // syllabus: _syllabus,
           onAccountTap: _onAccountTap,
         );
       case 3:
         return Reports(
-          syllabus: _syllabus,
+          // syllabus: _syllabus,
           onAccountTap: _onAccountTap,
         );
 

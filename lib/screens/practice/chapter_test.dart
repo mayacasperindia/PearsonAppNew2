@@ -11,8 +11,9 @@ import 'package:pearson_flutter/widgets/syllabus_picker.dart';
 class ChapterTest extends StatefulWidget {
   final List<String> syllabus;
   final VoidCallback onAccountTap;
+  final ScrollController controller;
 
-  const ChapterTest({Key key, this.syllabus, this.onAccountTap})
+  const ChapterTest({Key key, this.syllabus, this.controller, this.onAccountTap})
       : super(key: key);
 
   @override
@@ -81,17 +82,9 @@ class _ChapterTestState extends State<ChapterTest>
             elevation: 1,
             titleSpacing: 0,
             centerTitle: false,
-            floating: true,
-            snap: true,
-            title: SyllabusPicker(
-              syllabus: widget.syllabus,
-              onChange: (v) {
-                setState(() {
-                  _selectedSyllabus = v;
-                  globalSelectedSyllabus = v;
-                });
-              },
-            ),
+            floating: false,
+            snap: false,
+            // collapsedHeight: 60,
             leading: Image.asset("assets/images/favicon.png"),
             bottom: makeTabBar(),
             actions: [

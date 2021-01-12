@@ -66,6 +66,8 @@ class _ReportsState extends State<Reports> with SingleTickerProviderStateMixin {
     _tabController = TabController(length: 6, vsync: this);
     if (widget.syllabus?.isNotEmpty ?? false)
       _selectedSyllabus = widget.syllabus[1];
+
+    print('syllabus ${widget.syllabus}');
     super.initState();
   }
 
@@ -152,14 +154,6 @@ class _ReportsState extends State<Reports> with SingleTickerProviderStateMixin {
             elevation: 1,
             titleSpacing: 0,
             centerTitle: false,
-            title: SyllabusPicker(
-              syllabus: widget.syllabus,
-              onChange: (v) {
-                setState(() {
-                  _selectedSyllabus = v;
-                });
-              },
-            ),
             leading: Image.asset("assets/images/favicon.png"),
             bottom: makeTabBar(),
             actions: [
