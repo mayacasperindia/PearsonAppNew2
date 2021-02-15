@@ -3,9 +3,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:pearson_flutter/screens/practice/chapter_test.dart';
+import 'package:pearson_flutter/screens/practice/previous_year_paper.dart';
 import 'package:pearson_flutter/screens/practice/unit_test.dart';
+import 'package:pearson_flutter/screens/test_series/non_proctored_test.dart';
 import 'package:pearson_flutter/utils/config.dart';
-import 'package:pearson_flutter/widgets/rtab_indicator.dart';
 import 'package:pearson_flutter/widgets/syllabus_picker.dart';
 
 class PracticeHome extends StatefulWidget {
@@ -20,149 +21,135 @@ class PracticeHome extends StatefulWidget {
 }
 
 class _PracticeHomeState extends State<PracticeHome> {
+  String _selectedSyllabus;
+  var _items = ["Chapter Test", "Unit Test", "Previous Year Papers"];
 
   @override
   void initState() {
-    _selectedChapter = 0;
+    if (widget.syllabus?.isNotEmpty ?? false)
+      _selectedSyllabus = widget.syllabus[0];
     super.initState();
   }
 
   int _index = 0;
-  int _selectedChapter;
-  List<int> _practice = [
-    0,
-    1,
-    if(globalSelectedSyllabus == 'NEET XII' || globalSelectedSyllabus == 'JEE Main XII' || globalSelectedSyllabus == 'JEE Advanced XII' )
-      2,
-  ];
-
-  Widget makeSyllabusTab() {
-    return PopupMenuButton(
-      child: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: 140, maxHeight: 48),
-        child: FlatButton(
-          onPressed: null,
-          padding: EdgeInsets.all(5),
-          child: Column(
-            children: [
-              Expanded(
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        _selectedChapter == 0 ? 'Chapter Test' : _selectedChapter == 1 ? 'Unit Test' : 'Previous Year' ?? "<select>",
-                        maxLines: 1,
-                        // textScaleFactor: 0.5,
-                        textAlign: TextAlign.left,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    SizedBox(width: 5),
-                    Icon(Icons.keyboard_arrow_down),
-                  ],
-                ),
-              ),
-              Divider(height: 1),
-            ],
-          ),
-          disabledTextColor: Theme
-              .of(context)
-              .iconTheme
-              .color,
-        ),
-      ),
-      onSelected: (value) {
-        setState(() {
-          _index = value;
-          _selectedChapter = value;
-        });
-      },
-      itemBuilder: (_) =>
-      _practice
-          ?.map(
-            (e) =>
-            PopupMenuItem(
-              value: e,
-              child: Text(e == 0 ? 'Chapter Test' : e == 1 ? 'Unit Test' : 'Previous Year', textScaleFactor: 0.7,),
-            ),
-      )
-          ?.toList() ??
-          [],
-    );
-  }
-
-
-
-
-  //     Padding(
-  //     padding: const EdgeInsets.all(10.0),
-  //     child: CupertinoSegmentedControl(
-  //       onValueChanged: (value) {
-  //         setState(() => _index = value);
-  //       },
-  //       borderColor: Theme.of(context).iconTheme.color,
-  //       selectedColor: Theme.of(context).canvasColor,
-  //       groupValue: _index,
-  //       unselectedColor: AppConfig.kSwatch[200],
-  //       pressedColor: Theme.of(context).primaryColor,
-  //       children: {
-  //         0: Padding(
-  //           child: Text("Chapter Test", style: TextStyle(
-  //             color: Theme.of(context).buttonColor, fontWeight: FontWeight.w800
-  //           ),),
-  //           padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
-  //         ),
-  //         1: Padding(
-  //           child: Text("Unit Test", style: TextStyle(
-  //             color: Theme.of(context).buttonColor, fontWeight: FontWeight.w800
-  //           ),),
-  //           padding: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-  //         ),
-  //         if(globalSelectedSyllabus == 'NEET XII' || globalSelectedSyllabus == 'JEE Main XII' || globalSelectedSyllabus == 'JEE Advanced XII' )
-  //         2: Padding(
-  //           child: Text("Previous Year Question", style: TextStyle(
-  //             color: Theme.of(context).buttonColor, fontWeight: FontWeight.w800
-  //           ),),
-  //           padding: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-  //         ),
-  //       },
-  //     ),
-  //   );
-  // }
-
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        [
-          ChapterTest(
-            onAccountTap: widget.onAccountTap,
-            syllabus: widget.syllabus,
-          ),
-          UnitTest(
-            onAccountTap: widget.onAccountTap,
-            syllabus: widget.syllabus,
-          ),
-          if(globalSelectedSyllabus == 'NEET XII' || globalSelectedSyllabus == 'JEE Main XII' || globalSelectedSyllabus == 'JEE Advanced XII' )
+    return Scaffold(
+      body: Stack(
+        children: [
+          [
+            ChapterTest(
+              onAccountTap: widget.onAccountTap,
+              syllabus: widget.syllabus,
+              onSyllabusChange: (v) {
+                setState(() {
+                  _selectedSyllabus = v;
+                });
+              },
+            ),
             UnitTest(
-            onAccountTap: widget.onAccountTap,
-            syllabus: widget.syllabus,
-          ),
-        ][_index],
-        SafeArea(child: Padding(
-          padding: const EdgeInsets.only(left: 60),
-          child: Align(alignment: Alignment.topLeft, child: makeSyllabusTab()),
-        )),
-      ],
+              onAccountTap: widget.onAccountTap,
+              syllabus: widget.syllabus,
+              onSyllabusChange: (v) {
+                setState(() {
+                  _selectedSyllabus = v;
+                });
+              },
+            ),
+            PreviousYearPaper(
+              onAccountTap: widget.onAccountTap,
+              syllabus: widget.syllabus,
+              onSyllabusChange: (v) {
+                setState(() {
+                  _selectedSyllabus = v;
+                });
+              },
+            ),
+          ][_index],
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(FluentSystemIcons.ic_fluent_book_formula_date_filled),
+        backgroundColor: AppConfig.kFlagColor,
+        onPressed: _openFilter,
+      ),
     );
   }
 
-  _goto(Widget page) {
-    Navigator.push(
+  _openFilter() {
+    var items = <String>[];
+    items.clear();
+    if (_selectedSyllabus.contains("XII")) {
+      items.addAll(_items);
+    } else {
+      items.addAll(_items.take(2));
+    }
+    AppConfig.presentDialogWithChild(
       context,
-      CupertinoPageRoute(builder: (_) => page),
+      Filter(tests: items, selected: _index),
+    ).then((value) {
+      if (value is int) {
+        setState(() {
+          _index = value;
+        });
+      }
+    });
+  }
+}
+
+class Filter extends StatelessWidget {
+  final int selected;
+  final List<String> tests;
+
+  const Filter({Key key, this.selected = 0, this.tests}) : super(key: key);
+
+  _buildTrailing(BuildContext context, [selected = false]) {
+    if (selected)
+      return Icon(
+        FluentSystemIcons.ic_fluent_checkmark_circle_filled,
+        color: Theme.of(context).accentColor,
+      );
+    return Icon(FluentSystemIcons.ic_fluent_checkmark_circle_regular);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    print(selected);
+    return Align(
+      alignment: Alignment(1, 0.85),
+      child: Container(
+        width: 240,
+        child: Material(
+          borderRadius: BorderRadius.circular(AppConfig.kRadiusSmall),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: tests
+                    ?.map(
+                      (e) => ListTile(
+                        onTap: () {
+                          Navigator.pop(context, tests.indexOf(e));
+                        },
+                        title: Text(
+                          e,
+                          style: TextStyle(
+                            color: selected == tests.indexOf(e)
+                                ? Theme.of(context).accentColor
+                                : null,
+                          ),
+                        ),
+                        selected: selected == tests.indexOf(e),
+                        trailing: _buildTrailing(
+                          context,
+                          selected == tests.indexOf(e),
+                        ),
+                      ),
+                    )
+                    ?.toList() ??
+                [],
+          ),
+        ),
+      ),
     );
-    // _panelController.animatePanelToPosition(0.0, curve: Curves.easeInToLinear);
   }
 }

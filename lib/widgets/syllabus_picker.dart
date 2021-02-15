@@ -26,41 +26,47 @@ class _SyllabusPickerState extends State<SyllabusPicker> {
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton(
-      child: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: 140, maxHeight: 48),
-        child: FlatButton(
-          onPressed: null,
-          padding: EdgeInsets.all(5),
-          child: Column(
-            children: [
-              Expanded(
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        _selectedSyllabus ?? "<select>",
-                        maxLines: 1,
-                        // textScaleFactor: 0.5,
-                        textAlign: TextAlign.left,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    SizedBox(width: 5),
-                    Icon(Icons.keyboard_arrow_down),
-                  ],
-                ),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Container(
+          constraints: BoxConstraints(maxWidth: 240, maxHeight: 40),
+          decoration: BoxDecoration(
+            border: Border(
+              bottom: BorderSide(
+                color: Theme.of(context).dividerColor,
               ),
-              Divider(height: 1),
-            ],
+            ),
           ),
-          // shape: RoundedRectangleBorder(
-          //   side: BorderSide(
-          //     color: Theme.of(context).accentColor,
-          //   ),
-          //   borderRadius: BorderRadius.circular(AppConfig.kRadiusSmallest),
-          // ),
-          // disabledColor: Theme.of(context).accentColor.withOpacity(0.1),
-          disabledTextColor: Theme.of(context).iconTheme.color,
+          child: FlatButton(
+            onPressed: null,
+            padding: EdgeInsets.all(5),
+            child: Container(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Flexible(
+                    child: Text(
+                      _selectedSyllabus ?? "<select>",
+                      maxLines: 1,
+                      // textScaleFactor: 0.5,
+                      textAlign: TextAlign.left,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  SizedBox(width: 5),
+                  Icon(Icons.keyboard_arrow_down),
+                ],
+              ),
+            ),
+            // shape: RoundedRectangleBorder(
+            //   side: BorderSide(
+            //     color: Theme.of(context).accentColor,
+            //   ),
+            //   borderRadius: BorderRadius.circular(AppConfig.kRadiusSmallest),
+            // ),
+            // disabledColor: Theme.of(context).accentColor.withOpacity(0.1),
+            disabledTextColor: Theme.of(context).iconTheme.color,
+          ),
         ),
       ),
       onSelected: (v) {
@@ -74,7 +80,10 @@ class _SyllabusPickerState extends State<SyllabusPicker> {
               ?.map(
                 (e) => PopupMenuItem(
                   value: e,
-                  child: Text("$e",textScaleFactor:0.7,),
+                  child: Text(
+                    "$e",
+                    textScaleFactor: 0.7,
+                  ),
                 ),
               )
               ?.toList() ??

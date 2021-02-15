@@ -12,8 +12,14 @@ class ChapterTest extends StatefulWidget {
   final List<String> syllabus;
   final VoidCallback onAccountTap;
   final ScrollController controller;
+  final Function(String syllabus) onSyllabusChange;
 
-  const ChapterTest({Key key, this.syllabus, this.controller, this.onAccountTap})
+  const ChapterTest(
+      {Key key,
+      this.syllabus,
+      this.controller,
+      this.onAccountTap,
+      this.onSyllabusChange})
       : super(key: key);
 
   @override
@@ -84,7 +90,16 @@ class _ChapterTestState extends State<ChapterTest>
             centerTitle: false,
             floating: false,
             snap: false,
-            // collapsedHeight: 60,
+            title: SyllabusPicker(
+              syllabus: widget.syllabus,
+              onChange: (v) {
+                setState(() {
+                  _selectedSyllabus = v;
+                });
+                if (widget.onSyllabusChange != null)
+                  widget.onSyllabusChange(_selectedSyllabus);
+              },
+            ),
             leading: Image.asset("assets/images/favicon.png"),
             bottom: makeTabBar(),
             actions: [
@@ -100,6 +115,7 @@ class _ChapterTestState extends State<ChapterTest>
               ),
             ],
           ),
+
         ];
       },
     );

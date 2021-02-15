@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:pearson_flutter/utils/config.dart';
+import 'package:pearson_flutter/widgets/clippers.dart';
 
 class InputField extends StatelessWidget {
   final String label;
@@ -325,11 +326,21 @@ class LegendTile extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(right: 5),
       child: Chip(
-        label: Text(text),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppConfig.kRadiusSmallest),
+        ),
+        visualDensity: VisualDensity.compact,
+        label: Text(
+          text.toUpperCase(),
+          textScaleFactor: 0.8,
+          style: TextStyle(fontWeight: FontWeight.bold, height: 1.4),
+        ),
         avatar: Container(
+          width: 16,
+          height: 16,
           decoration: BoxDecoration(
             color: color,
-            borderRadius: BorderRadius.circular(AppConfig.kRadiusSmall),
+            borderRadius: BorderRadius.circular(AppConfig.kRadiusSmallest),
           ),
         ),
       ),
@@ -407,6 +418,136 @@ class LabelValueHolder extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class FloatingLabel extends StatelessWidget {
+  final String text;
+  final Alignment alignment;
+  final Color color;
+
+  const FloatingLabel(this.text,
+      {Key key, this.alignment = Alignment.topCenter, this.color})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(7.5),
+      child: Align(
+        alignment: alignment,
+        child: Material(
+          borderRadius: BorderRadius.circular(AppConfig.kRadiusSmall),
+          color: color ?? Theme.of(context).iconTheme.color.withOpacity(0.8),
+          child: Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Text(
+              text,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).canvasColor,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class IconLabel extends StatelessWidget {
+  final IconData icon;
+  final String title;
+
+  const IconLabel(this.icon, this.title, {Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(10.0),
+      child: Row(
+        children: [
+          Icon(
+            icon,
+            size: 16,
+            color: Theme.of(context).accentColor,
+          ),
+          SizedBox(width: 5),
+          Text(
+            title.toUpperCase(),
+            textScaleFactor: 0.9,
+            style: TextStyle(
+              color: Theme.of(context).accentColor,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class IconValue extends StatelessWidget {
+  final IconData icon;
+  final String value;
+  final Color iconColor;
+
+  const IconValue(this.icon, this.value, {Key key, this.iconColor})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(5.0),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            size: 14,
+            color: iconColor ?? Theme.of(context).accentColor,
+          ),
+          SizedBox(width: 5),
+          Flexible(
+            child: Text(
+              value,
+              textScaleFactor: 0.85,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class TooltipContainer extends StatelessWidget {
+  final Widget child;
+  final Color color;
+
+  const TooltipContainer({Key key, @required this.color, @required this.child})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(AppConfig.kRadiusSmallest),
+          ),
+          child: child,
+        ),
+        ClipPath(
+          clipper: TriangleClipper(),
+          child: Container(
+            width: 10,
+            height: 8,
+            color: color,
+          ),
+        ),
+      ],
     );
   }
 }

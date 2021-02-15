@@ -176,6 +176,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ],
                       ),
                     ),
+
                   ),
                   Divider(height: 1, indent: 48),
                   PopupMenuButton(

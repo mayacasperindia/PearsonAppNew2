@@ -1,18 +1,23 @@
 import 'package:fluentui_icons/fluentui_icons.dart';
 import 'package:flutter/material.dart';
-import 'package:pearson_flutter/screens/diagnosis/diagnosis_subject.dart';
+import 'package:flutter/widgets.dart';
+import 'package:pearson_flutter/homepage.dart';
+import 'package:pearson_flutter/screens/report/attempt_time_graph.dart';
+import 'package:pearson_flutter/screens/report/questions.dart';
+import 'package:pearson_flutter/screens/report/topic_wise_report.dart';
 import 'package:pearson_flutter/utils/config.dart';
 import 'package:pearson_flutter/widgets/report_picker.dart';
 import 'package:pearson_flutter/widgets/rtab_indicator.dart';
 import 'package:pearson_flutter/widgets/syllabus_picker.dart';
-import 'package:percent_indicator/circular_percent_indicator.dart';
+import 'package:pearson_flutter/widgets/widgets.dart';
 
 class Reports extends StatefulWidget {
+  final int selectedPage;
   final Widget child;
   final List<String> syllabus;
   final VoidCallback onAccountTap;
 
-  Reports({Key key, this.child, this.syllabus, this.onAccountTap})
+  Reports({Key key, this.child, this.syllabus, this.onAccountTap, this.selectedPage})
       : super(key: key);
 
   @override
@@ -63,7 +68,7 @@ class _ReportsState extends State<Reports> with SingleTickerProviderStateMixin {
 
   @override
   void initState() {
-    _tabController = TabController(length: 6, vsync: this);
+    _tabController = TabController(length: 6, vsync: this, initialIndex: widget.selectedPage == null ? 0 : widget.selectedPage);
     if (widget.syllabus?.isNotEmpty ?? false)
       _selectedSyllabus = widget.syllabus[1];
 
@@ -112,33 +117,39 @@ class _ReportsState extends State<Reports> with SingleTickerProviderStateMixin {
             topic: _topic,
             chapter: _chapter,
             attempt: _attempt,
+            selectedExam: 'exercise',
           ),
           ReportDropdown(
             subject: _subject,
             chapter: _chapter,
             topic: _topic,
             attempt: _attempt,
+            selectedExam: 'prep-meter',
           ),
           ReportDropdown(
             subject: _subject,
             chapter: _chapter,
             test: _test,
             attempt: _attempt,
+            selectedExam: 'chapter-test',
           ),
           ReportDropdown(
             test: _test,
             attempt: _attempt,
+            selectedExam: 'unit-test',
           ),
           ReportDropdown(
             classes: _classes,
             test: _test,
             attempt: _attempt,
+            selectedExam: 'previous-paper',
           ),
           ReportDropdown(
             classes: _classes,
             mode: _mode,
             test: _test,
             attempt: _attempt,
+            selectedExam: 'test-series',
           ),
         ],
         controller: _tabController,
@@ -152,9 +163,24 @@ class _ReportsState extends State<Reports> with SingleTickerProviderStateMixin {
             floating: true,
             forceElevated: true,
             elevation: 1,
+            title: SyllabusPicker(
+              syllabus: widget.syllabus,
+              onChange: (v) {
+                setState(() {
+                  _selectedSyllabus = v;
+                });
+              },
+            ),
             titleSpacing: 0,
             centerTitle: false,
-            leading: Image.asset("assets/images/favicon.png"),
+            leading: InkWell(
+                onTap: () {
+                  AppConfig.popGoto(
+                    context,
+                    HomePage(),
+                  );
+                },
+                child: widget.selectedPage != null ? Icon(Icons.clear) : Image.asset("assets/images/favicon.png")),
             bottom: makeTabBar(),
             actions: [
               Hero(
@@ -183,6 +209,7 @@ class ReportDropdown extends StatefulWidget {
   final List<String> classes;
   final List<String> mode;
   final List<String> test;
+  final String selectedExam;
 
   ReportDropdown(
       {this.subject,
@@ -191,7 +218,8 @@ class ReportDropdown extends StatefulWidget {
       this.attempt,
       this.classes,
       this.mode,
-      this.test});
+      this.test,
+      this.selectedExam});
 
   @override
   _ReportDropdownState createState() => _ReportDropdownState();
@@ -205,282 +233,300 @@ class _ReportDropdownState extends State<ReportDropdown> {
   String classPicker;
   String modePicker;
   String testPicker = 'Not Selected';
+  var _score = 2.6;
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 30),
+    return Scaffold(
+      body: SingleChildScrollView(
         child: Column(
           children: [
-            Column(
-              children: <Widget>[
-                if (widget.subject?.isNotEmpty ?? false)
-                  ReportsPicker(
-                    subject: widget.subject,
-                    select: 'Select Subject',
-                    onChange: (v) {
-                      setState(() {
-                        subjectPicker = v;
-                      });
-                    },
-                  ),
-                if (widget.topic?.isNotEmpty ?? false)
-                  ReportsPicker(
-                    subject: widget.topic,
-                    select: 'Select Topic',
-                    onChange: (v) {
-                      setState(() {
-                        topicPicker = v;
-                      });
-                    },
-                  ),
-                if (widget.chapter?.isNotEmpty ?? false)
-                  ReportsPicker(
-                    subject: widget.chapter,
-                    select: 'Select Chapter',
-                    onChange: (v) {
-                      setState(() {
-                        chapterPicker = v;
-                      });
-                    },
-                  ),
-                if (widget.classes?.isNotEmpty ?? false)
-                  ReportsPicker(
-                    subject: widget.classes,
-                    select: 'Select Classes',
-                    onChange: (v) {
-                      setState(() {
-                        classPicker = v;
-                      });
-                    },
-                  ),
-                if (widget.mode?.isNotEmpty ?? false)
-                  ReportsPicker(
-                    subject: widget.mode,
-                    select: 'Select Mode',
-                    onChange: (v) {
-                      setState(() {
-                        modePicker = v;
-                      });
-                    },
-                  ),
-                if (widget.test?.isNotEmpty ?? false)
-                  ReportsPicker(
-                    subject: widget.test,
-                    select: 'Select Test',
-                    onChange: (v) {
-                      setState(() {
-                        testPicker = v;
-                      });
-                    },
-                  ),
-                if (widget.attempt?.isNotEmpty ?? false)
-                  ReportsPicker(
-                    subject: widget.attempt,
-                    select: 'Select Attempt',
-                    onChange: (v) {
-                      setState(() {
-                        attemptPicker = v;
-                      });
-                    },
-                  ),
-              ],
-            ),
-            if (attemptPicker != 'Not Selected' ?? false)
-              Column(
+
+            Padding(
+              padding: const EdgeInsets.all(5.0),
+              child: Wrap(
                 children: [
-                  Container(
-                    padding: EdgeInsets.only(top: 15),
-                    child: Text(
-                      'Your Report',
-                      textAlign: TextAlign.center,
-                      textScaleFactor: 1.3,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
+                  FractionallySizedBox(
+                    widthFactor: 0.5,
+                    child: TopicPicker(
+                      items: ["Physics", "Chemistry"],
+                      hint: "Select subject",
+                      onChange: (v) {},
+                    ),
+                  ),
+                  if(widget.selectedExam == "exercise" || widget.selectedExam == "prep-meter" || widget.selectedExam == "chapter-test" || widget.selectedExam == "test-series")
+                    FractionallySizedBox(
+                    widthFactor: 0.5,
+                    child: TopicPicker(
+                      items: ["Force", "Pressure"],
+                      hint: "Select chapter",
+                      onChange: (v) {},
+                    ),
+                  ),
+                  FractionallySizedBox(
+                    widthFactor: 0.5,
+                    child: TopicPicker(
+                      items: ["Pascal\'s Law", "Gas Laws"],
+                      hint: "Select topic",
+                      onChange: (v) {},
+                    ),
+                  ),
+                  FractionallySizedBox(
+                    widthFactor: 0.5,
+                    child: TopicPicker(
+                      items: ["Attempt 1", "Attempt 2"],
+                      hint: "Select attempt",
+                      onChange: (v) {},
+                    ),
+                  ),
+                ],
+              ),
+            ),
+              Padding(
+              padding: const EdgeInsets.all(5.0),
+              child: Wrap(
+                children: [
+                  FractionallySizedBox(
+                    widthFactor: 0.5,
+                    child: CountCard(
+                      count: "12",
+                      topic: "Total",
+                      color: Colors.indigo,
+                      progress: 1.0,
+                    ),
+                  ),
+                  if(widget.selectedExam == "chapter-test" || widget.selectedExam == "unit-test" || widget.selectedExam == "previous-paper" || widget.selectedExam == "test-series")
+                    FractionallySizedBox(
+                      widthFactor: 0.5,
+                      child: CountCard(
+                        count: "8",
+                        topic: "Attempt",
+                        color: Colors.cyan,
+                        progress: 0.75,
+                      ),
+                    ),
+                  FractionallySizedBox(
+                    widthFactor: 0.5,
+                    child: CountCard(
+                      count: "4",
+                      topic: "Correct",
+                      color: Colors.green,
+                      progress: 0.25,
+                    ),
+                  ),
+                  if(widget.selectedExam == "exercise" || widget.selectedExam == "prep-meter")
+                    FractionallySizedBox(
+                    widthFactor: 0.5,
+                    child: CountCard(
+                      count: "8",
+                      topic: "Incorrect",
+                      color: Colors.red,
+                      progress: 0.75,
+                    ),
+                  ),
+                  if(widget.selectedExam == "chapter-test" || widget.selectedExam == "unit-test" || widget.selectedExam == "previous-paper" || widget.selectedExam == "test-series")
+                    FractionallySizedBox(
+                      widthFactor: 0.5,
+                      child: CountCard(
+                        count: "8",
+                        topic: "Skipped",
+                        color: Colors.red,
+                        progress: 0.75,
+                      ),
+                    ),
+                  FractionallySizedBox(
+                    widthFactor: 0.5,
+                    child: CountCard(
+                      count: "2:30",
+                      topic: (widget.selectedExam == "chapter-test" || widget.selectedExam == "unit-test" || widget.selectedExam == "previous-paper" || widget.selectedExam == "test-series") ?"Time (MM:SS)":'Time',
+                      color: Colors.cyan,
+                    ),
+                  ),
+                  if(widget.selectedExam == "chapter-test" || widget.selectedExam == "unit-test" || widget.selectedExam == "previous-paper" || widget.selectedExam == "test-series")
+                    FractionallySizedBox(
+                      widthFactor: 0.5,
+                      child: CountCard(
+                        count: "80/186",
+                        topic: "Mark",
+                        color: Colors.blueAccent,
+                        progress: 0.75,
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            if(widget.selectedExam == "prep-meter" || widget.selectedExam == "exercise")
+              AssessmentScoreCard(score: _score),
+            Questions(),
+            if(widget.selectedExam == "chapter-test" || widget.selectedExam == "unit-test" || widget.selectedExam == "previous-paper" || widget.selectedExam == "test-series")
+              TopicWiseReport(),
+            AttemptTimeGraph(),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class AssessmentScoreCard extends StatelessWidget {
+  final double score;
+  final String message;
+
+  const AssessmentScoreCard({Key key, @required this.score, this.message})
+      : super(key: key);
+
+  get _scorePos => (score / 10) - 1;
+
+  @override
+  Widget build(BuildContext context) {
+    return RCard(
+      child: Column(
+        children: [
+          IconLabel(Icons.show_chart, "Pearson Assessment Score"),
+          Divider(height: 1),
+          SizedBox(height: 10),
+          Align(
+            alignment: Alignment(_scorePos, 0),
+            child: SizedBox(
+              width: 72,
+              child: TooltipContainer(
+                color: Colors.red.withOpacity(0.5),
+                child: Padding(
+                  padding: EdgeInsets.all(5),
+                  child: Column(
+                    children: [
+                      Text(
+                        "Your score",
+                        textScaleFactor: 0.8,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        "$score",
+                        textScaleFactor: 1.1,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: Row(
+              children: [
+                Text(
+                  "0",
+                  style: TextStyle(color: Theme.of(context).dividerColor),
+                ),
+                SizedBox(width: 5),
+                Expanded(
+                  child: SizedBox(
+                    height: 10,
+                    child: ClipRRect(
+                      borderRadius:
+                          BorderRadius.circular(AppConfig.kRadiusSmall),
+                      child: LinearProgressIndicator(
+                        value: score / 10,
+                        valueColor: AlwaysStoppedAnimation(
+                          Colors.red,
+                        ),
                       ),
                     ),
                   ),
-                  Row(
-                    children: [
-                      Container(
-                          width: MediaQuery.of(context).size.width * 0.45,
-                          padding: EdgeInsets.all(10),
-                          child: CircularPercentIndicator(
-                            radius: MediaQuery.of(context).size.width * 0.25,
-                            lineWidth: 7,
-                            animation: true,
-                            percent: 60 / 100,
-                            center: Text(
-                              "60.0%",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 20.0),
-                            ),
-                            footer: Text(
-                              "Total",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 17.0),
-                            ),
-                            backgroundColor: Colors.black12,
-                            circularStrokeCap: CircularStrokeCap.round,
-                            progressColor: Theme.of(context).buttonColor,
-                          )),
-                      Container(
-                          width: MediaQuery.of(context).size.width * 0.45,
-                          padding: EdgeInsets.all(10),
-                          child: CircularPercentIndicator(
-                            radius: MediaQuery.of(context).size.width * 0.25,
-                            lineWidth: 7,
-                            animation: true,
-                            percent: 60 / 100,
-                            center: Text(
-                              "60.0%",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 20.0),
-                            ),
-                            footer: Text(
-                              "Correct",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 17.0),
-                            ),
-                            backgroundColor: Colors.black12,
-                            circularStrokeCap: CircularStrokeCap.round,
-                            progressColor: Colors.green,
-                          )),
-                    ],
-                  ),
-                  if (testPicker != 'Not Selected' ?? false)
-                    Row(
-                      children: [
-                        Container(
-                            width: MediaQuery.of(context).size.width * 0.45,
-                            padding: EdgeInsets.all(10),
-                            child: CircularPercentIndicator(
-                              radius: MediaQuery.of(context).size.width * 0.25,
-                              lineWidth: 7,
-                              animation: true,
-                              percent: 40 / 100,
-                              center: Text(
-                                "40.0%",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20.0),
-                              ),
-                              footer: Text(
-                                "Attempt",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 17.0),
-                              ),
-                              backgroundColor: Colors.black12,
-                              circularStrokeCap: CircularStrokeCap.round,
-                              progressColor: Colors.redAccent,
-                            )),
-                        Container(
-                            width: MediaQuery.of(context).size.width * 0.45,
-                            padding: EdgeInsets.all(10),
-                            child: CircularPercentIndicator(
-                              radius: MediaQuery.of(context).size.width * 0.25,
-                              lineWidth: 7,
-                              animation: true,
-                              percent: 90 / 100,
-                              center: Text(
-                                "90%",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20.0),
-                              ),
-                              footer: Text(
-                                "Skipped",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 17.0),
-                              ),
-                              backgroundColor: Colors.black12,
-                              circularStrokeCap: CircularStrokeCap.round,
-                              progressColor: Colors.cyan,
-                            )),
-                      ],
+                ),
+                SizedBox(width: 5),
+                Text(
+                  "10",
+                  style: TextStyle(color: Theme.of(context).dividerColor),
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Text(
+              message ??
+                  "Keep on Trying! You have not yet learned and understood the concepts in this topic. You are advised to study and take the test for this topic again.",
+              textScaleFactor: 0.85,
+              style: TextStyle(
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class CountCard extends StatelessWidget {
+  final String count;
+  final String topic;
+  final double progress;
+  final Color color;
+
+  const CountCard({Key key, this.count, this.topic, this.progress, this.color})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    var _color = color ?? Theme.of(context).accentColor;
+    return Padding(
+      padding: const EdgeInsets.all(10.0),
+      child: SizedBox(
+        height: 100,
+        child: Material(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppConfig.kRadiusSmall),
+            side: BorderSide(color: _color, width: 1),
+          ),
+          clipBehavior: Clip.hardEdge,
+          child: Column(
+            children: [
+              Expanded(
+                child: Stack(
+                  children: [
+                    SizedBox(
+                      height: double.maxFinite,
+                      child: LinearProgressIndicator(
+                        value: progress ?? 0.0,
+                        valueColor:
+                            AlwaysStoppedAnimation(_color.withOpacity(0.3)),
+                      ),
                     ),
-                  Row(
-                    children: [
-                      if (testPicker == 'Not Selected' ?? true)
-                        Container(
-                            width: MediaQuery.of(context).size.width * 0.45,
-                            padding: EdgeInsets.all(10),
-                            child: CircularPercentIndicator(
-                              radius: MediaQuery.of(context).size.width * 0.25,
-                              lineWidth: 7,
-                              animation: true,
-                              percent: 40 / 100,
-                              center: Text(
-                                "40.0%",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20.0),
-                              ),
-                              footer: Text(
-                                "Incorrect",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 17.0),
-                              ),
-                              backgroundColor: Colors.black12,
-                              circularStrokeCap: CircularStrokeCap.round,
-                              progressColor: Colors.redAccent,
-                            )),
-                      if (testPicker != 'Not Selected' ?? false)
-                        Container(
-                            width: MediaQuery.of(context).size.width * 0.45,
-                            padding: EdgeInsets.all(10),
-                            child: CircularPercentIndicator(
-                              radius: MediaQuery.of(context).size.width * 0.25,
-                              lineWidth: 7,
-                              animation: true,
-                              percent: 360 / 500,
-                              center: Text(
-                                "360",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20.0),
-                              ),
-                              footer: Text(
-                                "Mark",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 17.0),
-                              ),
-                              backgroundColor: Colors.black12,
-                              circularStrokeCap: CircularStrokeCap.round,
-                              progressColor: Theme.of(context).buttonColor,
-                            )),
-                      Container(
-                          width: MediaQuery.of(context).size.width * 0.45,
-                          padding: EdgeInsets.all(10),
-                          child: CircularPercentIndicator(
-                            radius: MediaQuery.of(context).size.width * 0.25,
-                            lineWidth: 7,
-                            animation: true,
-                            percent: 90 / 100,
-                            center: Text(
-                              "90%",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 20.0),
-                            ),
-                            footer: Text(
-                              "Time",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 17.0),
-                            ),
-                            backgroundColor: Colors.black12,
-                            circularStrokeCap: CircularStrokeCap.round,
-                            progressColor: Colors.cyan,
-                          )),
-                    ],
+                    Padding(
+                      padding: const EdgeInsets.all(7.5),
+                      child: Center(
+                        child: Text(
+                          "$count",
+                          textScaleFactor: 2.5,
+                          style: TextStyle(
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                child: Text(
+                  "$topic",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w900,
+                    color: Colors.white,
                   ),
-                ],
-              )
-          ],
+                ),
+                color: _color,
+                width: double.maxFinite,
+                padding: EdgeInsets.all(7.5),
+              ),
+            ],
+          ),
         ),
       ),
     );

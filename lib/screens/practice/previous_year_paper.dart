@@ -1,27 +1,24 @@
 import 'package:fluentui_icons/fluentui_icons.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:pearson_flutter/screens/practice/unit_test_item.dart';
+import 'package:pearson_flutter/screens/test_series/non_proctored_test.dart';
 import 'package:pearson_flutter/utils/config.dart';
 import 'package:pearson_flutter/widgets/syllabus_picker.dart';
 import 'package:pearson_flutter/widgets/widgets.dart';
-import 'package:pearson_flutter/unused/drawerExamWidget.dart';
-import 'package:pearson_flutter/widgets/my_scaffold.dart';
 
-class UnitTest extends StatefulWidget {
+class PreviousYearPaper extends StatefulWidget {
   final List<String> syllabus;
   final VoidCallback onAccountTap;
   final Function(String syllabus) onSyllabusChange;
 
-  const UnitTest(
+  const PreviousYearPaper(
       {Key key, this.syllabus, this.onAccountTap, this.onSyllabusChange})
       : super(key: key);
 
   @override
-  _UnitTestState createState() => _UnitTestState();
+  _PreviousYearPaperState createState() => _PreviousYearPaperState();
 }
 
-class _UnitTestState extends State<UnitTest> {
+class _PreviousYearPaperState extends State<PreviousYearPaper> {
   String _selectedSyllabus;
 
   @override
@@ -53,13 +50,7 @@ class _UnitTestState extends State<UnitTest> {
           ),
         ],
       ),
-      body: ListView.builder(
-        itemCount: 8,
-        padding: EdgeInsets.symmetric(vertical: 10),
-        itemBuilder: (context, index) => UnitTestItem(
-          enabled: index % 4 != 0,
-        ),
-      ),
+      body: NonProctoredTest(),
     );
   }
 }

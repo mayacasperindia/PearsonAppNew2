@@ -1,17 +1,23 @@
 import 'dart:async';
-import 'dart:ffi';
 import 'package:fluentui_icons/fluentui_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/widgets.dart';
+import 'package:pearson_flutter/screens/app/account.dart';
 import 'package:pearson_flutter/screens/exercise/answer_status.dart';
 import 'package:pearson_flutter/screens/exercise/information.dart';
 import 'package:pearson_flutter/screens/exercise/instruction_bottom_sheet.dart';
 import 'package:pearson_flutter/screens/exercise/sampleQuestionModel.dart';
+import 'package:pearson_flutter/screens/report/chapter_test_report.dart';
+import 'package:pearson_flutter/screens/report/exercise_report.dart';
+import 'package:pearson_flutter/screens/report/non_proctored_test.dart';
+import 'package:pearson_flutter/screens/report/premeter_report.dart';
+import 'package:pearson_flutter/screens/report/previous_year_report.dart';
+import 'package:pearson_flutter/screens/report/reports.dart';
+import 'package:pearson_flutter/screens/report/unit_test_report.dart';
 import 'package:pearson_flutter/utils/config.dart';
 import 'package:pearson_flutter/widgets/syllabus_picker.dart';
 import 'package:pearson_flutter/widgets/widgets.dart';
-import 'package:sticky_headers/sticky_headers.dart';
 
 class QuestionScreen extends StatefulWidget {
   final bool exercise;
@@ -47,6 +53,21 @@ class _QuestionScreenState extends State<QuestionScreen> {
   Timer _timer;
   PageController _controller = PageController();
 
+  List<String> _syllabus = [
+    'NEET XI',
+    'NEET XII',
+    'Foundation IX',
+    'Foundation X',
+    'JEE Main XI',
+    'JEE Main XII',
+    'JEE Advanced XI',
+    'JEE Advanced XII',
+  ];
+
+  _onAccountTap() async {
+    var res = await AppConfig.animateTo(context, Account());
+  }
+
   _init() {
     for (int i = 0; i < 3; i++)
       _questions.add(
@@ -69,23 +90,40 @@ class _QuestionScreenState extends State<QuestionScreen> {
   @override
   void initState() {
     super.initState();
-    print("prt : ${widget.proctoredTest} non ${widget.nonProctoredTest} unit=${widget.unit}");
+    print(
+        "prt : ${widget.proctoredTest} non ${widget.nonProctoredTest} unit=${widget.unit}");
     _init();
     _startTimer();
   }
 
   _startTimer() {
-    _rem = 6000;
+    _rem = widget.exercise ? 0 : 600;
+
     _timer = Timer.periodic(Duration(seconds: 1), (Timer timer) {
-      if (_rem <= 1) {
-        timer.cancel();
-      }
       setState(() {
-        _rem -= 1;
+        _rem = widget.exercise ? _rem + 1 : _rem - 1;
+
         if (_rem <= 0) {
-          _viewReport();
+          if (widget.exercise) {
+            _exerciseReport();
+          } else if (widget.preMeter) {
+            _preMeterReport();
+          } else if (widget.chapter) {
+            _chapterTestReport();
+          } else if (widget.unit) {
+            _unitTestReport();
+          } else if (widget.previousYear) {
+            _previousYearTestReport();
+          } else if (widget.nonProctoredTest) {
+            _nonProctoredReport();
+          } else {
+            _viewReport();
+          }
         }
       });
+      if (_rem <= 0) {
+        timer.cancel();
+      }
     });
   }
 
@@ -93,6 +131,48 @@ class _QuestionScreenState extends State<QuestionScreen> {
     AppConfig.popGoto(
       context,
       AnswerStatus(questions: _questions),
+    );
+  }
+
+  _exerciseReport() {
+    AppConfig.popGoto(
+      context,
+      Reports(selectedPage: 0, syllabus: _syllabus, onAccountTap: _onAccountTap,),
+    );
+  }
+
+  _preMeterReport() {
+    AppConfig.popGoto(
+      context,
+      Reports(selectedPage: 1, syllabus: _syllabus, onAccountTap: _onAccountTap,),
+    );
+  }
+
+  _chapterTestReport() {
+    AppConfig.popGoto(
+      context,
+      Reports(selectedPage: 2, syllabus: _syllabus, onAccountTap: _onAccountTap,),
+    );
+  }
+
+  _unitTestReport() {
+    AppConfig.popGoto(
+      context,
+      Reports(selectedPage: 3, syllabus: _syllabus, onAccountTap: _onAccountTap,),
+    );
+  }
+
+  _previousYearTestReport() {
+    AppConfig.popGoto(
+      context,
+      Reports(selectedPage: 4,  syllabus: _syllabus, onAccountTap: _onAccountTap,),
+    );
+  }
+
+  _nonProctoredReport() {
+    AppConfig.popGoto(
+      context,
+      Reports(selectedPage: 5, syllabus: _syllabus, onAccountTap: _onAccountTap,),
     );
   }
 
@@ -147,10 +227,10 @@ class _QuestionScreenState extends State<QuestionScreen> {
                   )
                 : null,
             actions: [
-              if ( widget.nonProctoredTest || widget.proctoredTest )
-              SyllabusPicker(
-                syllabus: ["Physics", "Chemistry", "Mathematics", "Biology"],
-              ),
+              if (widget.nonProctoredTest || widget.proctoredTest)
+                SyllabusPicker(
+                  syllabus: ["Physics", "Chemistry", "Mathematics", "Biology"],
+                ),
               IconButton(
                 onPressed: () {
                   showInstructionDialog();
@@ -245,9 +325,9 @@ class _QuestionScreenState extends State<QuestionScreen> {
     var min = _rem ~/ 60;
     var sec = _rem % 60;
     if (min > 0) {
-      return "${min}m ${sec}s rem";
+      return (widget.exercise) ? "${min}m ${sec}s" : "${min}m ${sec}s rem";
     }
-    return "${sec}s rem";
+    return (widget.exercise) ?  "${sec}s" : "${sec}s rem";
   }
 
   bool get _showAnswer => widget.exercise && _questions[_index].done;
@@ -306,23 +386,6 @@ class _QuestionScreenState extends State<QuestionScreen> {
               _bottomPanel
                   ? Row(
                       children: [
-                        SizedBox(width: 10),
-                        Expanded(
-                          child: OutlineButton(
-                            child: Text(
-                              "Clear".toUpperCase(),
-                            ),
-                            onPressed: _questions[index].selectedAnswer == null
-                                ? null
-                                : _questions[index].done
-                                    ? null
-                                    : () {
-                                        setState(() {
-                                          _questions[index].clearAnswer();
-                                        });
-                                      },
-                          ),
-                        ),
                         SizedBox(width: 10),
                         Expanded(
                           child: _nextButton,
@@ -478,7 +541,21 @@ class _QuestionScreenState extends State<QuestionScreen> {
             buttonText: "View Report".toUpperCase())
         .then((value) {
       if (value ?? false) {
-        _viewReport();
+        if (widget.exercise) {
+          _exerciseReport();
+        } else if (widget.preMeter) {
+          _preMeterReport();
+        } else if (widget.chapter) {
+          _chapterTestReport();
+        } else if (widget.unit) {
+          _unitTestReport();
+        } else if (widget.previousYear) {
+          _previousYearTestReport();
+        } else if (widget.nonProctoredTest) {
+          _nonProctoredReport();
+        } else {
+          _viewReport();
+        }
       }
     });
   }
@@ -535,9 +612,12 @@ class _QuestionScreenState extends State<QuestionScreen> {
           Expanded(
             child: FlatButton(
               onPressed: nextQuestion,
-              child: Icon(_index == _questions.length - 1
-                  ? FluentSystemIcons.ic_fluent_checkmark_filled
-                  : FluentSystemIcons.ic_fluent_arrow_right_filled),
+              child: _index == _questions.length - 1
+                  ? Text(
+                      "Submit".toUpperCase(),
+                      overflow: TextOverflow.ellipsis,
+                    )
+                  : Icon(FluentSystemIcons.ic_fluent_arrow_right_filled),
               color: _index == _questions.length - 1
                   ? AppConfig.kSuccessColor
                   : Theme.of(context).accentColor,

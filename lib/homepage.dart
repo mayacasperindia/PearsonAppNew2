@@ -4,7 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:pearson_flutter/screens/app/account.dart';
 import 'package:pearson_flutter/screens/diagnosis/diagnosis_home.dart';
+import 'package:pearson_flutter/screens/practice/chapter_test.dart';
 import 'package:pearson_flutter/screens/practice/practice_home.dart';
+import 'package:pearson_flutter/screens/practice/previous_year_paper.dart';
+import 'package:pearson_flutter/screens/practice/unit_test.dart';
 import 'package:pearson_flutter/screens/report/reports.dart';
 import 'package:pearson_flutter/screens/test_series/test_series_home.dart';
 import 'package:pearson_flutter/utils/config.dart';
@@ -21,14 +24,13 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String email;
-
-  int _currentIndex = 0;
-
   PageController _pageController;
+  String _selectedSyllabus;
 
   @override
   void initState() {
     _pageController = PageController();
+    _selectedSyllabus = _syllabus[0];
     super.initState();
   }
 
@@ -49,21 +51,40 @@ class _HomePageState extends State<HomePage> {
     'JEE Advanced XII',
   ];
 
+  _onSyllabusChange(String v) => setState(() => _selectedSyllabus = v);
+
   Widget get _page {
-    switch (_currentIndex) {
+    switch (_index) {
       case 1:
-        return PracticeHome(
-          // syllabus: _syllabus,
-          onAccountTap: _onAccountTap,
-        );
+        switch (_practiceIndex) {
+          case 1:
+            return UnitTest(
+              syllabus: _syllabus,
+              onSyllabusChange: _onSyllabusChange,
+              onAccountTap: _onAccountTap,
+            );
+          case 2:
+            return PreviousYearPaper(
+              syllabus: _syllabus,
+              onSyllabusChange: _onSyllabusChange,
+              onAccountTap: _onAccountTap,
+            );
+          default:
+            return ChapterTest(
+              syllabus: _syllabus,
+              onSyllabusChange: _onSyllabusChange,
+              onAccountTap: _onAccountTap,
+            );
+        }
+        break;
       case 2:
         return TestSeriesHome(
-          // syllabus: _syllabus,
+          syllabus: _syllabus,
           onAccountTap: _onAccountTap,
         );
       case 3:
         return Reports(
-          // syllabus: _syllabus,
+          syllabus: _syllabus,
           onAccountTap: _onAccountTap,
         );
 
@@ -75,152 +96,123 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-    _onAccountTap() async {
+  _onAccountTap() async {
     var res = await AppConfig.animateTo(context, Account());
   }
 
-  _accountMenuTap(AccountMenu menu) {
-    _panelController.close();
-    switch (menu) {
-      case AccountMenu.voucher:
-        // TODO: Handle this case.
-        break;
-      case AccountMenu.lang_en:
-        // TODO: Handle this case.
-        break;
-      case AccountMenu.lang_hi:
-        // TODO: Handle this case.
-        break;
-      case AccountMenu.logout:
-        AppConfig.presentDialog(
-          context,
-          icon: FluentSystemIcons.ic_fluent_sign_out_filled,
-          title: "Logout?",
-          message: "Do you really want to logout?",
-          positiveButtonText: "Logout".toUpperCase(),
-          positiveTint: Colors.red,
-          headerColor: Colors.red,
-        );
-        break;
-    }
-  }
+  int _index = 0;
 
-  double _offset = 0.0;
-
-  _onTap(int index) {
+  _onTap(int index) async {
     setState(() {
-      _currentIndex = index;
+      _index = index;
+      if (index == 1) {
+        _selectedSyllabus = _syllabus[0];
+        _expandPractice = !_expandPractice;
+      } else {
+        _expandPractice = false;
+      }
     });
   }
 
-  PanelController _panelController = PanelController();
+  _onPracticeTap(int index) {
+    setState(() {
+      _practiceIndex = index;
+      _expandPractice = false;
+    });
+  }
+
+  int _practiceIndex = 0;
+  bool _expandPractice = false;
 
   @override
   Widget build(BuildContext context) {
+    print(_index);
     return Scaffold(
-      bottomNavigationBar: BottomNavigationBar(
-        fixedColor: Theme.of(context).accentColor,
-        unselectedItemColor: Theme.of(context).hintColor,
-        onTap: _onTap,
-        currentIndex: _currentIndex,
-        showUnselectedLabels: true,
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(FluentSystemIcons.ic_fluent_document_search_filled),
-            label: "Diagnose",
+      bottomNavigationBar: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: BottomItem(
+                  icon: FluentSystemIcons.ic_fluent_document_search_filled,
+                  title: "Diagnosis",
+                  selected: _index == 0,
+                  onTap: () => _onTap(0),
+                ),
+              ),
+              Expanded(
+                child: BottomItem(
+                  icon: FluentSystemIcons.ic_fluent_document_edit_filled,
+                  title: "Practice",
+                  expanded: _expandPractice,
+                  backgroundColor: _expandPractice
+                      ? Theme.of(context).backgroundColor
+                      : null,
+                  selected: _index == 1,
+                  onTap: () => _onTap(1),
+                ),
+              ),
+              Expanded(
+                child: BottomItem(
+                  icon:
+                      FluentSystemIcons.ic_fluent_notebook_question_mark_filled,
+                  title: "Test Series",
+                  selected: _index == 2,
+                  onTap: () => _onTap(2),
+                ),
+              ),
+              Expanded(
+                child: BottomItem(
+                  icon: FluentSystemIcons.ic_fluent_document_endnote_filled,
+                  title: "Report",
+                  selected: _index == 3,
+                  onTap: () => _onTap(3),
+                ),
+              ),
+            ],
           ),
-          BottomNavigationBarItem(
-            icon: Icon(FluentSystemIcons.ic_fluent_document_edit_filled),
-            label: "Practice",
-          ),
-          BottomNavigationBarItem(
-            icon:
-                Icon(FluentSystemIcons.ic_fluent_notebook_question_mark_filled),
-            label: "Test Series",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(FluentSystemIcons.ic_fluent_document_endnote_filled),
-            label: "Report",
-          ),
+          AnimatedContainer(
+            color: Theme.of(context).backgroundColor,
+            duration: Duration(milliseconds: 300),
+            padding: EdgeInsets.all(10),
+            height: _expandPractice ? 72 : 0,
+            child: SingleChildScrollView(
+              child: Row(
+                children: [
+                  Expanded(
+                    child: BottomItemBordered(
+                      icon: FluentSystemIcons.ic_fluent_notebook_regular,
+                      title: "Chapter Test",
+                      selected: _practiceIndex == 0,
+                      onTap: () => _onPracticeTap(0),
+                    ),
+                  ),
+                  Expanded(
+                    child: BottomItemBordered(
+                      icon: FluentSystemIcons.ic_fluent_tap_single_regular,
+                      title: "Unit Test",
+                      selected: _practiceIndex == 1,
+                      onTap: () => _onPracticeTap(1),
+                    ),
+                  ),
+                  if (_selectedSyllabus.contains("II"))
+                    Expanded(
+                      child: BottomItemBordered(
+                        icon: FluentSystemIcons.ic_fluent_previous_regular,
+                        title: "Previous Year Paper",
+                        selected: _practiceIndex == 2,
+                        onTap: () => _onPracticeTap(2),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          )
         ],
       ),
       body: _page,
     );
-  }
-
-  /*
-  SlidingUpPanel(
-        body: Padding(
-          padding: EdgeInsets.only(bottom: 60),
-          child: _page,
-        ),
-        minHeight: 60,
-        maxHeight: 300,
-        parallaxEnabled: true,
-        backdropEnabled: true,
-        collapsed: Row(
-          children: [
-            Expanded(
-              child: BottomItem(
-                icon: CupertinoIcons.doc_text_search,
-                title: "Diagnosis",
-                selected: _currentIndex == 0,
-                onTap: () => _onTap(0),
-              ),
-            ),
-            Expanded(
-              child: BottomItem(
-                icon: CupertinoIcons.pencil_outline,
-                title: "Practice",
-                selected: _currentIndex == 1,
-                onTap: () => _onTap(1),
-              ),
-            ),
-            Expanded(
-              child: BottomItem(
-                icon: CupertinoIcons.book,
-                title: "Test Series",
-                selected: _currentIndex == 2,
-                onTap: () => _onTap(2),
-              ),
-            ),
-            Expanded(
-              child: BottomItem(
-                icon: CupertinoIcons.lab_flask,
-                title: "Report",
-                selected: _currentIndex == 3,
-                onTap: () => _onTap(3),
-              ),
-            ),
-            Expanded(
-              child: BottomItem(
-                icon: CupertinoIcons.person,
-                title: "Profile",
-                selected: _currentIndex == 4,
-                onTap: () => _panelController.open(),
-              ),
-            ),
-          ],
-        ),
-        onPanelSlide: (offset) {
-          setState(() => _offset = offset);
-        },
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(AppConfig.kRadiusSmall),
-        ),
-        controller: _panelController,
-        panelBuilder: (c) => Padding(
-          padding: EdgeInsets.only(top: (1 - _offset) * 60),
-          child: Account(),
-        ),
-      )
-   */
-  _goto(Widget page) {
-    Navigator.push(
-      context,
-      CupertinoPageRoute(builder: (_) => page),
-    );
-    // _panelController.animatePanelToPosition(2.0, curve: Curves.easeInToLinear);
   }
 }
 
@@ -229,42 +221,137 @@ class BottomItem extends StatelessWidget {
   final String title;
   final bool selected;
   final VoidCallback onTap;
+  final Color backgroundColor;
+  final bool expanded;
 
-  const BottomItem(
+  const BottomItem({
+    Key key,
+    this.icon,
+    this.title,
+    this.selected = false,
+    this.onTap,
+    this.backgroundColor,
+    this.expanded,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: backgroundColor,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 5),
+        child: SizedBox(
+          height: 60,
+          child: InkWell(
+            onTap: onTap,
+            child: Padding(
+              padding: const EdgeInsets.all(5.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Flexible(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          icon,
+                          color: selected
+                              ? Theme.of(context).accentColor
+                              : Theme.of(context).hintColor,
+                        ),
+                        if (expanded != null)
+                          SizedBox(
+                            width: 20,
+                            child: ExpandIcon(
+                              isExpanded: expanded ?? false,
+                              padding: EdgeInsets.zero,
+                              onPressed: null,
+                              disabledColor: selected
+                                  ? Theme.of(context).accentColor
+                                  : Theme.of(context).hintColor,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 5),
+                  Text(
+                    title,
+                    textScaleFactor: 0.9,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontWeight: FontWeight.normal,
+                      color: selected
+                          ? Theme.of(context).accentColor
+                          : Theme.of(context).hintColor,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class BottomItemBordered extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const BottomItemBordered(
       {Key key, this.icon, this.title, this.selected = false, this.onTap})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
-    return SizedBox(
-      height: 60,
-      child: InkWell(
-        onTap: onTap,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Flexible(
-              child: Icon(
-                icon,
-                color: selected
-                    ? Theme.of(context).buttonColor
-                    : Theme.of(context).hintColor,
+    var color = selected
+        ? Theme.of(context).accentColor
+        : Theme.of(context).dividerColor;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 5),
+      child: SizedBox(
+        height: 50,
+        child: Material(
+          color: color.withOpacity(0.2),
+          shape: RoundedRectangleBorder(
+            side: BorderSide(color: color),
+            borderRadius: BorderRadius.circular(AppConfig.kRadiusSmall),
+          ),
+          child: InkWell(
+            onTap: onTap,
+            child: Padding(
+              padding: const EdgeInsets.all(5.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Flexible(
+                    child: Icon(
+                      icon,
+                      color: selected
+                          ? Theme.of(context).accentColor
+                          : Theme.of(context).hintColor,
+                    ),
+                  ),
+                  SizedBox(height: 5),
+                  Text(
+                    title,
+                    textScaleFactor: 0.9,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontWeight: FontWeight.normal,
+                      color: selected
+                          ? Theme.of(context).accentColor
+                          : Theme.of(context).hintColor,
+                    ),
+                  ),
+                ],
               ),
             ),
-            SizedBox(height: 5),
-            Text(
-              title,
-              textScaleFactor: 0.9,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontWeight: FontWeight.w300,
-                color: selected
-                    ? Theme.of(context).buttonColor
-                    : Theme.of(context).hintColor,
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );

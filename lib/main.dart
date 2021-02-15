@@ -273,7 +273,7 @@ class MyApp extends StatelessWidget {
               borderRadius: BorderRadius.circular(AppConfig.kRadiusSmall),
             ),
             height: 36,
-            buttonColor: Color(settings.color),
+            buttonColor: AppConfig.kFlagColor,
           ),
           popupMenuTheme: PopupMenuThemeData(
             shape: RoundedRectangleBorder(
@@ -283,7 +283,7 @@ class MyApp extends StatelessWidget {
           primaryColor: Colors.white,
           canvasColor: Colors.white,
           accentColor: Color(settings.color),
-          buttonColor: Color(settings.color),
+          buttonColor: AppConfig.kFlagColor,
           cardColor: Colors.white,
           secondaryHeaderColor: AppConfig.kHeaderColor,
           backgroundColor: AppConfig.kSwatch[50],
@@ -323,7 +323,7 @@ class MyApp extends StatelessWidget {
               borderRadius: BorderRadius.circular(AppConfig.kRadiusSmall),
             ),
             height: 36,
-            buttonColor: Color(settings.color),
+            buttonColor: AppConfig.kFlagColor,
           ),
           popupMenuTheme: PopupMenuThemeData(
             shape: RoundedRectangleBorder(
@@ -334,7 +334,7 @@ class MyApp extends StatelessWidget {
           primaryColor: AppConfig.kSwatch,
           canvasColor: AppConfig.kSwatch,
           accentColor: Color(settings.color),
-          buttonColor: Color(settings.color),
+          buttonColor: AppConfig.kFlagColor,
           secondaryHeaderColor: AppConfig.kHeaderColorDark,
           cardColor: AppConfig.kSwatch,
           hintColor: Colors.white38,
