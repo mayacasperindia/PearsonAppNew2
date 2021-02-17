@@ -1,6 +1,8 @@
 import 'package:fluentui_icons/fluentui_icons.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:pearson_flutter/screens/registration/account_setting.dart';
+import 'package:pearson_flutter/screens/registration/add_voucher.dart';
 import 'package:pearson_flutter/utils/config.dart';
 
 import '../registration/login.dart';
@@ -158,7 +160,10 @@ class _AccountState extends State<Account> {
                                       icon: Icon(
                                         FluentSystemIcons.ic_fluent_edit_filled,
                                       ),
-                                      onPressed: () {},
+                                      onPressed: () {
+                                        AppConfig.goto(context, AccountSetting());
+
+                                      },
                                       color: Theme.of(context).accentColor,
                                     )
                                   ],
@@ -177,7 +182,7 @@ class _AccountState extends State<Account> {
                     Divider(height: 1),
                     InkWell(
                       onTap: () {
-                        Navigator.pop(context, AccountMenu.voucher);
+                        AppConfig.goto(context, DialogPopup2());
                       },
                       child: Padding(
                         padding: const EdgeInsets.all(15.0),
